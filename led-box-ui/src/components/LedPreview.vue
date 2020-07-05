@@ -125,6 +125,7 @@ export default Vue.extend({
       if (this.animationRequestId !== null) {
         window.cancelAnimationFrame(this.animationRequestId);
       }
+      this.clearForeground();
 
       if (this.ledPattern.animationType === AnimationType.None) {
         this.drawPattern();
@@ -139,6 +140,11 @@ export default Vue.extend({
         this.animationRequestId = window.requestAnimationFrame(timeStamp => this.animateBlink(timeStamp, false, 0));
       } else if (this.ledPattern.animationType === AnimationType.Chase) {
         this.drawPattern();
+      }
+    },
+    clearForeground() {
+      if (this.foregroundContext !== null && this.foregroundCanvas) {
+        this.foregroundContext.clearRect(0, 0, this.foregroundCanvas.width, this.loopHeight);
       }
     },
     drawPattern() {
@@ -251,8 +257,7 @@ export default Vue.extend({
         }
 
         if (dimmingColorFactor !== null) {
-          this.foregroundContext.clearRect(0, 0, this.foregroundCanvas.width, this.loopHeight);
-          console.log(this.$vuetify.theme.currentTheme.background);
+          this.clearForeground();
           this.foregroundContext.fillStyle = this.backgroundColor.toRGBAString(dimmingColorFactor);
           this.foregroundContext.fillRect(0, 0, this.foregroundCanvas.width, this.loopHeight);
         }
