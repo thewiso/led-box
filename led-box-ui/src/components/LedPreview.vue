@@ -7,14 +7,14 @@
 }
 .ledPreviewContainer {
   width: 100%;
-  display: flex;
-  justify-content: center;
+  position: relative;
 }
 </style>
 
 <template>
-  <div class="ledPreviewContainer">
-    <canvas :id="id" class="ledPreviewCanvas" :height="loopHeight"> </canvas>
+  <div :id="id + '-container'" class="ledPreviewContainer">
+    <canvas :id="id + '-background'" class="ledPreviewCanvas" :height="loopHeight" style="z-index: 0;"> </canvas>
+    <canvas :id="id + '-foreground'" class="ledPreviewCanvas" :height="loopHeight" style="z-index: 1;"> </canvas>
   </div>
 </template>
 
@@ -58,8 +58,13 @@ export default Vue.extend({
     loopHeight: Math.ceil(LOOP_HEIGHT),
 
     //non const variables:
-    canvas: null as null | HTMLCanvasElement,
-    context: null as null | CanvasRenderingContext2D,
+    backgroundCanvas: null as null | HTMLCanvasElement,
+    foregroundCanvas: null as null | HTMLCanvasElement,
+    backgroundContext: null as null | CanvasRenderingContext2D,
+    foregroundContext: null as null | CanvasRenderingContext2D,
+    canvasContainer: null as null | HTMLDivElement,
+
+    backgroundColor: RGBColor.White,
     horizontalOffset: 0,
     loopCount: 0,
     ledIndex: 0,
@@ -70,23 +75,53 @@ export default Vue.extend({
   }),
   methods: {
     init() {
-      this.canvas = document.getElementById(this.id) as HTMLCanvasElement;
-      this.context = this.canvas.getContext("2d");
+      this.backgroundCanvas = document.getElementById(this.id + "-background") as HTMLCanvasElement;
+      this.foregroundCanvas = document.getElementById(this.id + "-foreground") as HTMLCanvasElement;
+
+      this.backgroundContext = this.backgroundCanvas.getContext("2d");
+      this.foregroundContext = this.foregroundCanvas.getContext("2d");
+
+      this.canvasContainer = document.getElementById(this.id + "-container") as HTMLDivElement;
+      this.canvasContainer.style.height = this.loopHeight + "px";
+
+      //find out background
+      let currentElement = this.canvasContainer as HTMLElement | null;
+      let foundColor = false;
+      while (currentElement !== null && !foundColor) {
+        const currentStyle = window.getComputedStyle(currentElement);
+        if (currentStyle.backgroundColor !== "rgba(0, 0, 0, 0)" && currentStyle.backgroundColor !== "") {
+          foundColor = true;
+          const backgroundColorOrNull = RGBColor.fromString(currentStyle.backgroundColor);
+          if (backgroundColorOrNull !== null) {
+            this.backgroundColor = backgroundColorOrNull;
+          } else {
+            console.error(`Could not parse background color string ${currentStyle.backgroundColor}`);
+            this.backgroundColor = RGBColor.White;
+          }
+        }
+        currentElement = currentElement.parentElement;
+      }
+
       this.onResize();
     },
     onResize() {
-      if (this.canvas) {
-        const width = this.canvas.clientWidth;
-        if (width != this.canvas.width) {
-          this.canvas.width = width;
+      if (this.backgroundCanvas && this.foregroundCanvas) {
+        const width = this.backgroundCanvas.clientWidth;
+        if (width != this.backgroundCanvas.width) {
+          this.backgroundCanvas.width = width;
+          this.foregroundCanvas.width = width;
 
           this.loopCount = Math.floor(width / LOOP_WIDTH);
           this.horizontalOffset = (width % LOOP_WIDTH) / 2;
+
           this.onPatternChange();
         }
       }
     },
     onPatternChange() {
+      const ledCount = this.loopCount * LOOP_LED_COUNT;
+      this.fillLedColorArray(ledCount);
+
       if (this.animationRequestId !== null) {
         window.cancelAnimationFrame(this.animationRequestId);
       }
@@ -96,52 +131,48 @@ export default Vue.extend({
       } else if (this.ledPattern.animationType === AnimationType.Blink) {
         this.blinkToggleDuration = Math.round(1000 / this.ledPattern.blinkSpeed / 2);
 
-        if (this.ledPattern.blinkDimmingPeriodFactor === 0) {
-          this.animationRequestId = window.requestAnimationFrame(timeStamp => this.animateBlink(timeStamp, false, 0));
-        } else {
+        if (this.ledPattern.blinkDimmingPeriodFactor > 0) {
           this.blinkDimmingDuration = this.blinkToggleDuration * this.ledPattern.blinkDimmingPeriodFactor;
-          this.animationRequestId = window.requestAnimationFrame(timeStamp =>
-            this.animateDimmedBlink(timeStamp, false, 0),
-          );
         }
+
+        this.drawPattern();
+        this.animationRequestId = window.requestAnimationFrame(timeStamp => this.animateBlink(timeStamp, false, 0));
       } else if (this.ledPattern.animationType === AnimationType.Chase) {
         this.drawPattern();
       }
     },
     drawPattern() {
-      if (this.context && this.canvas) {
-        const ledCount = this.loopCount * LOOP_LED_COUNT;
+      if (this.backgroundContext && this.backgroundCanvas) {
         this.ledIndex = 0;
 
-        this.context.setTransform(1, 0, 0, 1, 0, 0);
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.context.translate(this.horizontalOffset, 0);
+        this.backgroundContext.setTransform(1, 0, 0, 1, 0, 0);
+        this.backgroundContext.clearRect(0, 0, this.backgroundCanvas.width, this.backgroundCanvas.height);
+        this.backgroundContext.translate(this.horizontalOffset, 0);
 
-        this.fillLedColorArray(ledCount);
         for (let loopIndex = 0; loopIndex < this.loopCount; loopIndex++) {
           let verticalDirectionFactor = 1;
           if (loopIndex % 2 !== 0) {
             verticalDirectionFactor = -1;
           }
 
-          this.drawLedPath(this.context, LOOP_HORIZONTAL_LED_COUNT_HALF, LED_DIAMETER, 0);
-          this.context.translate(CORNER_OFFSET, CORNER_OFFSET * verticalDirectionFactor);
-          this.drawLedPath(this.context, LOOP_VERTICAL_LED_COUNT, 0, LED_DIAMETER * verticalDirectionFactor);
-          this.context.translate(CORNER_OFFSET, CORNER_OFFSET * verticalDirectionFactor);
-          this.drawLedPath(this.context, LOOP_HORIZONTAL_LED_COUNT_HALF, LED_DIAMETER, 0);
-          this.context.translate(LED_DIAMETER, 0);
+          this.drawLedPath(this.backgroundContext, LOOP_HORIZONTAL_LED_COUNT_HALF, LED_DIAMETER, 0);
+          this.backgroundContext.translate(CORNER_OFFSET, CORNER_OFFSET * verticalDirectionFactor);
+          this.drawLedPath(this.backgroundContext, LOOP_VERTICAL_LED_COUNT, 0, LED_DIAMETER * verticalDirectionFactor);
+          this.backgroundContext.translate(CORNER_OFFSET, CORNER_OFFSET * verticalDirectionFactor);
+          this.drawLedPath(this.backgroundContext, LOOP_HORIZONTAL_LED_COUNT_HALF, LED_DIAMETER, 0);
+          this.backgroundContext.translate(LED_DIAMETER, 0);
         }
       }
     },
-    drawLedPath(context: CanvasRenderingContext2D, count: number, xTranslation = 0, yTranslation = 0) {
+    drawLedPath(backgroundContext: CanvasRenderingContext2D, count: number, xTranslation = 0, yTranslation = 0) {
       for (let i = 0; i < count; i++) {
         if (i > 0) {
-          context.translate(xTranslation, yTranslation);
+          backgroundContext.translate(xTranslation, yTranslation);
         }
-        this.drawLed(context);
+        this.drawLed(backgroundContext);
       }
     },
-    drawLed(context: CanvasRenderingContext2D) {
+    drawLed(backgroundContext: CanvasRenderingContext2D) {
       let ledColor = null as null | RGBColor;
       if (this.ledPattern.repitionFactor === 0) {
         if (this.ledIndex < this.ledColors.length) {
@@ -153,8 +184,8 @@ export default Vue.extend({
       }
 
       if (ledColor !== null) {
-        context.fillStyle = ledColor.toString();
-        context.fill(LED_PATH);
+        backgroundContext.fillStyle = ledColor.toString();
+        backgroundContext.fill(LED_PATH);
       }
       this.ledIndex++;
     },
@@ -199,53 +230,35 @@ export default Vue.extend({
       }
     },
     animateBlink(timeStamp: number, currentBlinkState: boolean, nextToggleTimestamp: number) {
-      if (timeStamp >= nextToggleTimestamp) {
-        if (this.context && this.canvas) {
-          if (currentBlinkState) {
-            this.context.setTransform(1, 0, 0, 1, 0, 0);
-            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-          } else {
-            this.drawPattern();
-          }
-          currentBlinkState = !currentBlinkState;
-          nextToggleTimestamp = timeStamp + this.blinkToggleDuration;
-        }
-      }
-      this.animationRequestId = window.requestAnimationFrame(timeStamp =>
-        this.animateBlink(timeStamp, currentBlinkState, nextToggleTimestamp),
-      );
-    },
-    animateDimmedBlink(timeStamp: number, currentBlinkState: boolean, nextToggleTimestamp: number) {
-      if (this.context && this.canvas) {
-        //TODO: performance
+      if (this.foregroundContext && this.foregroundCanvas) {
         let dimmingColorFactor = null as null | number;
         if (timeStamp >= nextToggleTimestamp) {
           currentBlinkState = !currentBlinkState;
           nextToggleTimestamp = timeStamp + this.blinkToggleDuration;
 
-          //just to make sure for the moment the dimming is 0 or 1 because it could stay on 0.97 or 0.01 with the logic stated in the second condition
           dimmingColorFactor = currentBlinkState ? 0 : 1;
         }
 
-        if (dimmingColorFactor !== null || timeStamp >= nextToggleTimestamp - this.blinkDimmingDuration) {
-          if (dimmingColorFactor === null) {
-            dimmingColorFactor = (nextToggleTimestamp - timeStamp) / this.blinkDimmingDuration;
-            if (currentBlinkState) {
-              dimmingColorFactor = 1 - dimmingColorFactor;
-            }
+        if (
+          this.ledPattern.blinkDimmingPeriodFactor > 0 &&
+          dimmingColorFactor === null &&
+          timeStamp >= nextToggleTimestamp - this.blinkDimmingDuration
+        ) {
+          dimmingColorFactor = (nextToggleTimestamp - timeStamp) / this.blinkDimmingDuration;
+          if (currentBlinkState) {
+            dimmingColorFactor = 1 - dimmingColorFactor;
           }
+        }
 
-          this.drawPattern();
-
-          this.context.save();
-          this.context.setTransform(1, 0, 0, 1, 0, 0);
-          this.context.globalAlpha = dimmingColorFactor;
-          this.drawPattern();
-          this.context.restore();
+        if (dimmingColorFactor !== null) {
+          this.foregroundContext.clearRect(0, 0, this.foregroundCanvas.width, this.loopHeight);
+          console.log(this.$vuetify.theme.currentTheme.background);
+          this.foregroundContext.fillStyle = this.backgroundColor.toRGBAString(dimmingColorFactor);
+          this.foregroundContext.fillRect(0, 0, this.foregroundCanvas.width, this.loopHeight);
         }
       }
       this.animationRequestId = window.requestAnimationFrame(timeStamp =>
-        this.animateDimmedBlink(timeStamp, currentBlinkState, nextToggleTimestamp),
+        this.animateBlink(timeStamp, currentBlinkState, nextToggleTimestamp),
       );
     },
   },

@@ -3,6 +3,8 @@ export default class RGBColor {
   private green = 0;
   private blue = 0;
 
+  private static readonly RGB_REGEX = /rgb\((\d+),(\d+),(\d+)\)/g;
+
   constructor(red: number, green: number, blue: number) {
     if (RGBColor.isValidColor(red, green, blue)) {
       this.red = red;
@@ -15,7 +17,6 @@ export default class RGBColor {
     const newRed = RGBColor.mergePrimaryColors(this.red, otherColor.red, factor);
     const newGreen = RGBColor.mergePrimaryColors(this.green, otherColor.green, factor);
     const newBlue = RGBColor.mergePrimaryColors(this.blue, otherColor.blue, factor);
-    // debugger
     return new RGBColor(newRed, newGreen, newBlue);
   }
 
@@ -36,6 +37,10 @@ export default class RGBColor {
     }
 
     return `#${hexParts[0]}${hexParts[1]}${hexParts[2]}`;
+  }
+
+  public toRGBAString(alpha: number) {
+    return `rgba(${this.red},${this.green},${this.blue},${alpha})`;
   }
 
   public static isValidPrimaryColor(primaryColor: number): boolean {
@@ -67,6 +72,16 @@ export default class RGBColor {
       }
     }
 
+    return null;
+  }
+
+  public static fromString(colorString: string): RGBColor | null {
+    colorString = colorString.replaceAll(/\s/g, "");
+    const matches = RGBColor.RGB_REGEX.exec(colorString);
+
+    if (matches?.length === 4) {
+      return new RGBColor(parseInt(matches[1]), parseInt(matches[2]), parseInt(matches[3]));
+    }
     return null;
   }
 
