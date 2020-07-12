@@ -17,12 +17,21 @@ export const MAX_BLINK_SPEED = 3;
 export const MIN_BLINK_DIMMING_PERIOD_FACTOR = 0; //no dimming
 export const MAX_BLINK_DIMMING_PERIOD_FACTOR = 1; //full period between on and off
 
+export const MIN_CHASE_SPEED = 0.1; //repetitions per second
+export const MAX_CHASE_SPEED = 2;
+
+export const MIN_CHASE_LENGTH_FACTOR = 0; //one led
+export const MAX_CHASE_LENGTH_FACTOR = 0.5; //half of leds
+
+export const MIN_CHASE_GRADIENT_LENGTH_FACTOR = 0; //no gradient
+export const MAX_CHASE_GRADIENT_LENGTH_FACTOR  = 0.5; //gradient length takes half of the leds of the case
+
 export enum AnimationType {
   None,
   Blink,
   Chase,
 }
-
+//TODO: implemented model logic in extra class?
 export default class LedPattern {
   private _colors: RGBColor[];
   private _repitionFactor: number;
@@ -30,9 +39,10 @@ export default class LedPattern {
   private _animationType: AnimationType;
   private _blinkSpeed: number;
   private _blinkDimmingPeriodFactor: number;
+  private _chaseSpeed: number;
   private _isPatternChaseBackground: boolean;
   private _chaseForeground: RGBColor;
-  private _chaseLength: number;
+  private _chaseLengthFactor: number;
   private _chaseGradientLengthFactor: number;
 
   constructor() {
@@ -46,9 +56,10 @@ export default class LedPattern {
     this._blinkSpeed = 1;
     this._blinkDimmingPeriodFactor = 0; //TODO: reset all animation specific values after changing the animation type
 
+    this._chaseSpeed = MIN_CHASE_SPEED;
     this._isPatternChaseBackground = false;
     this._chaseForeground = RGBColor.White;
-    this._chaseLength = 1;
+    this._chaseLengthFactor = 0.1;
     this._chaseGradientLengthFactor = 0;
   }
 
@@ -154,11 +165,11 @@ export default class LedPattern {
     this._chaseForeground = value;
   }
 
-  public get chaseLength(): number {
-    return this._chaseLength;
+  public get chaseLengthFactor(): number {
+    return this._chaseLengthFactor;
   }
-  public set chaseLength(value: number) {
-    this._chaseLength = value;
+  public set chaseLengthFactor(value: number) {
+    this._chaseLengthFactor = value;
   }
 
   public get chaseGradientLengthFactor(): number {
@@ -166,5 +177,12 @@ export default class LedPattern {
   }
   public set chaseGradientLengthFactor(value: number) {
     this._chaseGradientLengthFactor = value;
+  }
+
+  public get chaseSpeed(): number {
+    return this._chaseSpeed;
+  }
+  public set chaseSpeed(value: number) {
+    this._chaseSpeed = value;
   }
 }
