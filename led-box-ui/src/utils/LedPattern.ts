@@ -17,11 +17,11 @@ export const MAX_BLINK_SPEED = 3;
 export const MIN_BLINK_DIMMING_PERIOD_FACTOR = 0; //no dimming
 export const MAX_BLINK_DIMMING_PERIOD_FACTOR = 1; //full period between on and off
 
-export const MIN_CHASE_SPEED = 0.1; //repetitions per second
-export const MAX_CHASE_SPEED = 2;
+export const MIN_CHASE_SPEED = 1; //leds per second
+export const MAX_CHASE_SPEED = 100;
 
 export const MIN_CHASE_LENGTH_FACTOR = 0; //one led
-export const MAX_CHASE_LENGTH_FACTOR = 0.5; //half of leds
+export const MAX_CHASE_LENGTH_FACTOR = 0.99; 
 
 export const MIN_CHASE_GRADIENT_LENGTH_FACTOR = 0; //no gradient
 export const MAX_CHASE_GRADIENT_LENGTH_FACTOR  = 0.5; //gradient length takes half of the leds of the case
@@ -40,8 +40,7 @@ export default class LedPattern {
   private _blinkSpeed: number;
   private _blinkDimmingPeriodFactor: number;
   private _chaseSpeed: number;
-  private _isPatternChaseBackground: boolean;
-  private _chaseForeground: RGBColor;
+  private _chaseForeground: RGBColor | undefined;
   private _chaseLengthFactor: number;
   private _chaseGradientLengthFactor: number;
 
@@ -57,8 +56,7 @@ export default class LedPattern {
     this._blinkDimmingPeriodFactor = 0; //TODO: reset all animation specific values after changing the animation type
 
     this._chaseSpeed = MIN_CHASE_SPEED;
-    this._isPatternChaseBackground = false;
-    this._chaseForeground = RGBColor.White;
+    this._chaseForeground = undefined;
     this._chaseLengthFactor = 0.1;
     this._chaseGradientLengthFactor = 0;
   }
@@ -151,17 +149,10 @@ export default class LedPattern {
     this._blinkDimmingPeriodFactor = value;
   }
 
-  public get isPatternChaseBackground(): boolean {
-    return this._isPatternChaseBackground;
-  }
-  public set isPatternChaseBackground(value: boolean) {
-    this._isPatternChaseBackground = value;
-  }
-
-  public get chaseForeground(): RGBColor {
+  public get chaseForeground(): RGBColor | undefined{
     return this._chaseForeground;
   }
-  public set chaseForeground(value: RGBColor) {
+  public set chaseForeground(value: RGBColor | undefined) {
     this._chaseForeground = value;
   }
 

@@ -22,22 +22,10 @@
 import Vue from "vue";
 import LedPattern, { AnimationType } from "../utils/LedPattern";
 import RGBColor from "../utils/RGBColor";
-
-const LED_RADIUS = 5;
-const LED_DIAMETER = LED_RADIUS * 2;
-const CORNER_OFFSET = Math.sqrt(2) * LED_RADIUS;
-
-const LOOP_VERTICAL_LED_COUNT = 5;
-const LOOP_HORIZONTAL_LED_COUNT = 2; //Has to be even!
-const LOOP_HORIZONTAL_LED_COUNT_HALF = LOOP_HORIZONTAL_LED_COUNT / 2;
-
-const LOOP_WIDTH = (LOOP_HORIZONTAL_LED_COUNT - 1) * LED_DIAMETER + CORNER_OFFSET * 2;
-const LOOP_HEIGHT = LOOP_VERTICAL_LED_COUNT * LED_DIAMETER + CORNER_OFFSET * 2;
-const LOOP_LED_COUNT = LOOP_VERTICAL_LED_COUNT + LOOP_HORIZONTAL_LED_COUNT;
-
-const LED_PATH = new Path2D();
-//center x, center y, radius, start angle, end angle
-LED_PATH.arc(LED_RADIUS, LED_RADIUS, LED_RADIUS, 0, Math.PI * 2);
+import Led, { Coordinate } from "../utils/Led";
+import LedCanvasPreview, { LOOP_HEIGHT, LOOP_WIDTH, LOOP_LED_COUNT } from "../utils/LedCanvasPreview/LedCanvasPreview";
+import BlinkLedCanvasPreview from "../utils/LedCanvasPreview/BlinkLedCanvasPreview";
+import ChaseLedCanvasPreview from "../utils/LedCanvasPreview/ChaseLedCanvasPreview";
 
 export default Vue.extend({
   name: "LedPreview",
@@ -65,13 +53,9 @@ export default Vue.extend({
     canvasContainer: null as null | HTMLDivElement,
 
     backgroundColor: RGBColor.White,
-    horizontalOffset: 0,
     loopCount: 0,
     ledCount: 0,
-    ledColors: new Array<RGBColor>(),
-    animationRequestId: null as null | number,
-    blinkToggleDuration: 0,
-    blinkDimmingDuration: 0,
+    ledCanvasPreview: null as null | LedCanvasPreview,
   }),
   methods: {
     init() {
@@ -105,14 +89,20 @@ export default Vue.extend({
       this.onResize();
     },
     onResize() {
-      if (this.backgroundCanvas && this.foregroundCanvas) {
+      if (this.backgroundCanvas && this.backgroundContext && this.foregroundCanvas && this.foregroundContext) {
         const width = this.backgroundCanvas.clientWidth;
         if (width != this.backgroundCanvas.width) {
           this.backgroundCanvas.width = width;
           this.foregroundCanvas.width = width;
 
           this.loopCount = Math.floor(width / LOOP_WIDTH);
-          this.horizontalOffset = (width % LOOP_WIDTH) / 2;
+          const horizontalOffset = (width % LOOP_WIDTH) / 2;
+
+          this.backgroundContext.setTransform(1, 0, 0, 1, 0, 0);
+          this.backgroundContext.translate(horizontalOffset, 0);
+
+          this.foregroundContext.setTransform(1, 0, 0, 1, 0, 0);
+          this.foregroundContext.translate(horizontalOffset, 0);
 
           this.onPatternChange();
         }
@@ -128,184 +118,61 @@ export default Vue.extend({
         return;
       }
 
-      this.ledCount = this.loopCount * LOOP_LED_COUNT;
-      this.fillLedColorArray(this.ledCount);
-
-      if (this.animationRequestId !== null) {
-        window.cancelAnimationFrame(this.animationRequestId);
+      if (this.ledCanvasPreview !== null) {
+        this.ledCanvasPreview.finish();
+        this.ledCanvasPreview = null;
       }
-      this.clearForeground();
+
+      this.ledCount = this.loopCount * LOOP_LED_COUNT;
 
       if (this.ledPattern.animationType === AnimationType.None) {
-        this.drawPattern(this.backgroundCanvas, this.backgroundContext, this.ledColors);
+        this.ledCanvasPreview = new LedCanvasPreview(
+          this.backgroundContext,
+          this.backgroundCanvas.width,
+          this.backgroundCanvas.height,
+          this.backgroundColor,
+          this.ledPattern.colors,
+          this.ledCount,
+          this.ledPattern.repitionFactor,
+          this.ledPattern.colorGradientLengthFactor,
+          this.loopCount,
+        );
       } else if (this.ledPattern.animationType === AnimationType.Blink) {
-        this.blinkToggleDuration = Math.round(1000 / this.ledPattern.blinkSpeed / 2);
-
-        if (this.ledPattern.blinkDimmingPeriodFactor > 0) {
-          this.blinkDimmingDuration = this.blinkToggleDuration * this.ledPattern.blinkDimmingPeriodFactor;
-        }
-
-        this.drawPattern(this.backgroundCanvas, this.backgroundContext, this.ledColors);
-        this.animationRequestId = window.requestAnimationFrame(timeStamp => this.animateBlink(timeStamp, false, 0));
+        this.ledCanvasPreview = new BlinkLedCanvasPreview(
+          this.foregroundContext,
+          this.backgroundContext,
+          this.backgroundCanvas.width,
+          this.backgroundCanvas.height,
+          this.backgroundColor,
+          this.ledPattern.colors,
+          this.ledCount,
+          this.ledPattern.repitionFactor,
+          this.ledPattern.colorGradientLengthFactor,
+          this.loopCount,
+          this.ledPattern.blinkSpeed,
+          this.ledPattern.blinkDimmingPeriodFactor,
+        );
       } else if (this.ledPattern.animationType === AnimationType.Chase) {
-        if (this.ledPattern.isPatternChaseBackground) {
-          this.drawPattern(this.backgroundCanvas, this.backgroundContext, this.ledColors);
-        }
-
-        //TODO:
-      }
-    },
-    clearForeground() {
-      if (this.foregroundContext !== null && this.foregroundCanvas) {
-        this.foregroundContext.clearRect(0, 0, this.foregroundCanvas.width, this.loopHeight);
-      }
-    },
-    //startIndex: inclusive, endIndex: exclusive
-    drawPattern(
-      canvas: HTMLCanvasElement,
-      context: CanvasRenderingContext2D,
-      colors: RGBColor[],
-      startIndex = 0,
-      endIndex = -1,
-    ) {
-      if (endIndex === -1) {
-        endIndex = this.ledCount;
-      }
-      if (startIndex >= endIndex || startIndex < 0 || endIndex > this.ledCount) {
-        throw new Error(
-          `startIndex=${startIndex} and endIndex=${endIndex} does not satisfy condition '0 <= startIndex < endIndex <= ${this.ledCount}'`,
+        this.ledCanvasPreview = new ChaseLedCanvasPreview(
+          this.foregroundContext,
+          this.backgroundContext,
+          this.backgroundCanvas.width,
+          this.backgroundCanvas.height,
+          this.backgroundColor,
+          this.ledPattern.colors,
+          this.ledCount,
+          this.ledPattern.repitionFactor,
+          this.ledPattern.colorGradientLengthFactor,
+          this.loopCount,
+          this.ledPattern.chaseLengthFactor,
+          this.ledPattern.chaseSpeed,
+          this.ledPattern.chaseForeground,
         );
       }
 
-      context.setTransform(1, 0, 0, 1, 0, 0);
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      context.translate(this.horizontalOffset, 0);
-
-      let currentIndex = 0;
-      const ledColorCallback = () => {
-        let retVal = null as RGBColor | null;
-        if (currentIndex >= startIndex && currentIndex < endIndex) {
-          const index = (currentIndex - startIndex) % this.ledColors.length;
-          retVal = colors[index];
-        }
-        currentIndex++;
-        return retVal;
-      };
-
-      for (let loopIndex = 0; loopIndex < this.loopCount; loopIndex++) {
-        let verticalDirectionFactor = 1;
-        if (loopIndex % 2 !== 0) {
-          verticalDirectionFactor = -1;
-        }
-
-        this.drawLedPath(context, LOOP_HORIZONTAL_LED_COUNT_HALF, ledColorCallback, LED_DIAMETER, 0);
-        context.translate(CORNER_OFFSET, CORNER_OFFSET * verticalDirectionFactor);
-        this.drawLedPath(context, LOOP_VERTICAL_LED_COUNT, ledColorCallback, 0, LED_DIAMETER * verticalDirectionFactor);
-        context.translate(CORNER_OFFSET, CORNER_OFFSET * verticalDirectionFactor);
-        this.drawLedPath(context, LOOP_HORIZONTAL_LED_COUNT_HALF, ledColorCallback, LED_DIAMETER, 0);
-        context.translate(LED_DIAMETER, 0);
+      if (this.ledCanvasPreview !== null) {
+        this.ledCanvasPreview.init();
       }
-    },
-    drawLedPath(
-      context: CanvasRenderingContext2D,
-      count: number,
-      ledColorCallback: () => RGBColor | null,
-      xTranslation = 0,
-      yTranslation = 0,
-    ) {
-      for (let i = 0; i < count; i++) {
-        if (i > 0) {
-          context.translate(xTranslation, yTranslation);
-        }
-        this.drawLed(context, ledColorCallback);
-      }
-    },
-    drawLed(context: CanvasRenderingContext2D, ledColorCallback: () => RGBColor | null) {
-      const ledColor = ledColorCallback();
-
-      if (ledColor !== null) {
-        context.fillStyle = ledColor.toString();
-        context.fill(LED_PATH);
-      }
-    },
-    fillLedColorArray(ledCount: number) {
-      const colorCount = this.ledPattern.colors.length;
-      const ledColorShare = Math.floor(ledCount / colorCount);
-
-      let ledCountPerColorInRepition = Math.ceil((1 - this.ledPattern.repitionFactor) * ledColorShare);
-      if (ledCountPerColorInRepition === 0) {
-        ledCountPerColorInRepition = 1;
-      }
-      const ledCountPerRepition = ledCountPerColorInRepition * colorCount;
-      const colorGradientLengthPerColor = Math.floor(
-        ledCountPerColorInRepition * this.ledPattern.colorGradientLengthFactor,
-      );
-      const colorGradientMergeFactor = 1 / (colorGradientLengthPerColor * 2 + 1);
-
-      this.ledColors = new Array<RGBColor>();
-      for (let i = 0; i < this.ledPattern.colors.length; i++) {
-        const currentColor = this.ledPattern.colors[i];
-        const previousColorIndex = i > 0 ? i - 1 : this.ledPattern.colors.length - 1;
-        const previousColor = this.ledPattern.colors[previousColorIndex];
-        const nextColorIndex = i < this.ledPattern.colors.length - 1 ? i + 1 : 0;
-        const nextColor = this.ledPattern.colors[nextColorIndex];
-
-        for (let j = 0; j < ledCountPerColorInRepition; j++) {
-          let ledColor = currentColor;
-          if (this.ledPattern.colorGradientLengthFactor > 0 && ledCountPerColorInRepition > 1) {
-            if (j < colorGradientLengthPerColor) {
-              const ledInGradientIndex = j + colorGradientLengthPerColor;
-              const gradientFactor = colorGradientMergeFactor * (ledInGradientIndex + 1);
-              ledColor = previousColor.blend(currentColor, gradientFactor);
-            } else if (j >= ledCountPerColorInRepition - colorGradientLengthPerColor) {
-              const ledInGradientIndex = j - ledCountPerColorInRepition + colorGradientLengthPerColor;
-              const gradientFactor = colorGradientMergeFactor * (ledInGradientIndex + 1);
-              ledColor = currentColor.blend(nextColor, gradientFactor);
-            }
-          }
-
-          this.ledColors.push(ledColor);
-        }
-      }
-      
-      //a bit hacky, but otherwise the preview looks off
-      if (this.ledPattern.repitionFactor === 0 && this.ledPattern.colorGradientLengthFactor === 0) {
-        const lastColor = this.ledColors[this.ledColors.length - 1];
-        while (this.ledColors.length < ledCount) {
-          this.ledColors.push(lastColor);
-        }
-      }
-    },
-    animateBlink(timeStamp: number, currentBlinkState: boolean, nextToggleTimestamp: number) {
-      if (this.foregroundContext && this.foregroundCanvas) {
-        let dimmingColorFactor = null as null | number;
-        if (timeStamp >= nextToggleTimestamp) {
-          currentBlinkState = !currentBlinkState;
-          nextToggleTimestamp = timeStamp + this.blinkToggleDuration;
-
-          dimmingColorFactor = currentBlinkState ? 0 : 1;
-        }
-
-        if (
-          this.ledPattern.blinkDimmingPeriodFactor > 0 &&
-          dimmingColorFactor === null &&
-          timeStamp >= nextToggleTimestamp - this.blinkDimmingDuration
-        ) {
-          dimmingColorFactor = (nextToggleTimestamp - timeStamp) / this.blinkDimmingDuration;
-          if (currentBlinkState) {
-            dimmingColorFactor = 1 - dimmingColorFactor;
-          }
-        }
-
-        if (dimmingColorFactor !== null) {
-          this.clearForeground();
-          this.foregroundContext.fillStyle = this.backgroundColor.toRGBAString(dimmingColorFactor);
-          this.foregroundContext.fillRect(0, 0, this.foregroundCanvas.width, this.loopHeight);
-        }
-      }
-      this.animationRequestId = window.requestAnimationFrame(timeStamp =>
-        this.animateBlink(timeStamp, currentBlinkState, nextToggleTimestamp),
-      );
     },
   },
   mounted() {

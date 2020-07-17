@@ -159,11 +159,11 @@
                 </v-col>
                 <v-col cols="12" v-if="ledPattern.animationType == animationTypeEnum.Chase">
                   <v-subheader>Chase color</v-subheader>
-                  <v-radio-group v-model="ledPattern.isPatternChaseBackground" :mandatory="false" row>
-                    <v-radio label="Use pattern as chase color" :value="false"></v-radio>
-                    <v-radio label="Use pattern as background" :value="true"></v-radio>
+                  <v-radio-group v-model="isPatternChaseColor" :mandatory="false" row>
+                    <v-radio label="Use pattern as chase color" :value="true"></v-radio>
+                    <v-radio label="Use pattern as background" :value="false"></v-radio>
                   </v-radio-group>
-                  <div v-if="ledPattern.isPatternChaseBackground">
+                  <div v-if="!isPatternChaseColor">
                     <v-btn depressed :color="ledPattern.chaseForeground.toString()">Normal</v-btn>
                   </div>
                 </v-col>
@@ -198,7 +198,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";//TODO: font color contrast in buttons for color picking
+import Vue from "vue"; //TODO: font color contrast in buttons for color picking
 import LedPattern, {
   MIN_REPITION_FACTOR,
   MAX_REPITION_FACTOR,
@@ -217,6 +217,7 @@ import LedPattern, {
   MIN_CHASE_GRADIENT_LENGTH_FACTOR,
 } from "../utils/LedPattern";
 import LedPreview from "./LedPreview.vue";
+import RGBColor from "../utils/RGBColor";
 
 export default Vue.extend({
   name: "PatternConfiguration",
@@ -255,6 +256,21 @@ export default Vue.extend({
     minChaseGradientLengthFactor: MIN_CHASE_GRADIENT_LENGTH_FACTOR,
     maxChaseGradientLengthFactor: MAX_COLOR_GRADIENT_LENGTH_FACTOR,
   }),
+  computed: {
+    isPatternChaseColor: {
+      get: function() {
+        return this.ledPattern.chaseForeground === undefined;
+      },
+      // setter
+      set: function(newValue: boolean) {
+        if (newValue && this.ledPattern.chaseForeground !== undefined) {
+          this.ledPattern.chaseForeground = undefined;
+        } else if (!newValue && this.ledPattern.chaseForeground === undefined) {
+          this.ledPattern.chaseForeground = RGBColor.White;
+        }
+      },
+    },
+  },
   methods: {
     getTitle() {
       if (this.patternId === undefined) {
