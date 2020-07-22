@@ -18,7 +18,7 @@ export const MIN_BLINK_DIMMING_PERIOD_FACTOR = 0; //no dimming
 export const MAX_BLINK_DIMMING_PERIOD_FACTOR = 1; //full period between on and off
 
 export const MIN_CHASE_SPEED = 1; //leds per second
-export const MAX_CHASE_SPEED = 100;
+export const MAX_CHASE_SPEED = 300;
 
 export const MIN_CHASE_LENGTH_FACTOR = 0; //one led
 export const MAX_CHASE_LENGTH_FACTOR = 0.99; 
@@ -55,7 +55,7 @@ export default class LedPattern {
     this._blinkSpeed = 1;
     this._blinkDimmingPeriodFactor = 0; //TODO: reset all animation specific values after changing the animation type
 
-    this._chaseSpeed = MIN_CHASE_SPEED;
+    this._chaseSpeed = 25;
     this._chaseForeground = undefined;
     this._chaseLengthFactor = 0.1;
     this._chaseGradientLengthFactor = 0;

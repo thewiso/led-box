@@ -100,9 +100,11 @@ export default Vue.extend({
 
           this.backgroundContext.setTransform(1, 0, 0, 1, 0, 0);
           this.backgroundContext.translate(horizontalOffset, 0);
+          this.backgroundContext.save();
 
           this.foregroundContext.setTransform(1, 0, 0, 1, 0, 0);
           this.foregroundContext.translate(horizontalOffset, 0);
+          this.foregroundContext.save();
 
           this.onPatternChange();
         }
@@ -165,6 +167,7 @@ export default Vue.extend({
           this.ledPattern.colorGradientLengthFactor,
           this.loopCount,
           this.ledPattern.chaseLengthFactor,
+          this.ledPattern.chaseGradientLengthFactor,
           this.ledPattern.chaseSpeed,
           this.ledPattern.chaseForeground,
         );

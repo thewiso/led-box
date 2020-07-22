@@ -20,7 +20,7 @@ export default class LedCanvasPreview {
   protected canvasWidth: number;
   protected canvasHeight: number;
 
-  private context: CanvasRenderingContext2D;
+  protected context: CanvasRenderingContext2D;
 
   constructor(
     context: CanvasRenderingContext2D,
@@ -59,11 +59,19 @@ export default class LedCanvasPreview {
 
     for (let i = 0; i < this.leds.length; i++) {
       const led = this.leds[i];
-      this.context.fillStyle = led.color.toString();
-      this.context.beginPath();
-      this.context.arc(led.x, led.y, LED_RADIUS, 0, Math.PI * 2);
-      this.context.fill();
+      this.drawLed(this.context, led);
     }
+  }
+
+  protected drawLed(context: CanvasRenderingContext2D, led: Led) {
+    this.drawCircle(context, led.color, led.x, led.y);
+  }
+
+  protected drawCircle(context: CanvasRenderingContext2D, color: RGBColor, x: number, y: number) {
+    context.fillStyle = color.toString();
+    context.beginPath();
+    context.arc(x, y, LED_RADIUS, 0, Math.PI * 2);
+    context.fill();
   }
 
   private fillLedArray(
@@ -106,8 +114,14 @@ export default class LedCanvasPreview {
     const colorGradientMergeFactor = 1 / (colorGradientLengthPerColor * 2 + 1);
 
     for (let i = 0; i < this.leds.length; i++) {
-      const currentColorIndex = Math.floor(i / ledCountPerColorInRepition) % colorCount;
+      let currentColorIndex = Math.floor(i / ledCountPerColorInRepition) % colorCount;
       const indexInRepition = i % ledCountPerColorInRepition;
+
+      if (colorGradientLengthFactor === 0 && repitionFactor === 0 && currentColorIndex === 0 && i > ledCountPerColorInRepition) {
+        //a bit hacky, but otherwise the preview looks off
+        currentColorIndex = colorCount - 1;
+      }
+
       let currentColor = patternColors[currentColorIndex];
 
       if (colorGradientLengthFactor > 0 && ledCountPerColorInRepition > 1) {
@@ -130,7 +144,6 @@ export default class LedCanvasPreview {
       this.leds[i].color = currentColor;
     }
 
-    //a bit hacky, but otherwise the preview looks off
     //TODO:
     // if (this.ledPattern.repitionFactor === 0 && this.ledPattern.colorGradientLengthFactor === 0) {
     //   const lastColor = this.leds[this.leds.length - 1].color;
