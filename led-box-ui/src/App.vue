@@ -6,30 +6,16 @@
 
 <template>
   <v-app>
-    <v-app-bar app color="primary" dense>
-      <v-icon>mdi-led-on</v-icon>
+    <v-app-bar app color="primary">
+      <v-icon large color="accent">mdi-led-on</v-icon>
       <v-toolbar-title class="app-bar-title">LED Manager</v-toolbar-title>
     </v-app-bar>
     <v-main>
-      <v-btn
-        fixed
-        fab
-        bottom
-        right
-        color="primary"
-        @click="handleAddConfigurationButtonClick"
-      >
+      <v-btn fixed fab bottom right color="primary" @click="handleAddConfigurationButtonClick">
         <v-icon>mdi-plus</v-icon>
       </v-btn>
-      <v-dialog
-        v-model="patternConfigurationDialogOpen"
-        fullscreen
-        hide-overlay
-        transition="dialog-bottom-transition"
-      >
-        <PatternConfiguration
-          @configurationFinished="handleConfigurationFinished"
-        />
+      <v-dialog v-model="patternConfigurationDialogOpen" fullscreen hide-overlay transition="dialog-bottom-transition">
+        <PatternConfiguration @configurationFinished="handleConfigurationFinished" />
       </v-dialog>
     </v-main>
   </v-app>
@@ -43,11 +29,11 @@ export default Vue.extend({
   name: "App",
 
   components: {
-    PatternConfiguration
+    PatternConfiguration,
   },
 
   data: () => ({
-    patternConfigurationDialogOpen: false
+    patternConfigurationDialogOpen: false,
   }),
   methods: {
     handleAddConfigurationButtonClick: function() {
@@ -55,7 +41,7 @@ export default Vue.extend({
     },
     handleConfigurationFinished: function() {
       this.patternConfigurationDialogOpen = false;
-    }
-  }
+    },
+  },
 });
 </script>
