@@ -21,10 +21,10 @@ export const MIN_CHASE_SPEED = 1; //leds per second
 export const MAX_CHASE_SPEED = 300;
 
 export const MIN_CHASE_LENGTH_FACTOR = 0; //one led
-export const MAX_CHASE_LENGTH_FACTOR = 0.99; 
+export const MAX_CHASE_LENGTH_FACTOR = 0.99;
 
 export const MIN_CHASE_GRADIENT_LENGTH_FACTOR = 0; //no gradient
-export const MAX_CHASE_GRADIENT_LENGTH_FACTOR  = 0.5; //gradient length takes half of the leds of the case
+export const MAX_CHASE_GRADIENT_LENGTH_FACTOR = 0.5; //gradient length takes half of the leds of the case
 
 export enum AnimationType {
   None,
@@ -78,7 +78,7 @@ export default class LedPattern {
   public addHexColor(hexColor: string) {
     const color = RGBColor.fromHex(hexColor);
 
-    if (color !== null) {
+    if (color !== undefined) {
       this.addColor(color);
     }
   }
@@ -90,7 +90,7 @@ export default class LedPattern {
   public setHexColor(index: number, hexColor: string) {
     const color = RGBColor.fromHex(hexColor);
 
-    if (color !== null) {
+    if (color !== undefined) {
       this._colors[index] = color;
     }
   }
@@ -149,7 +149,7 @@ export default class LedPattern {
     this._blinkDimmingPeriodFactor = value;
   }
 
-  public get chaseForeground(): RGBColor | undefined{
+  public get chaseForeground(): RGBColor | undefined {
     return this._chaseForeground;
   }
   public set chaseForeground(value: RGBColor | undefined) {

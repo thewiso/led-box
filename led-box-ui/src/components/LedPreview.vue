@@ -22,7 +22,6 @@
 import Vue from "vue";
 import LedPattern, { AnimationType } from "../utils/LedPattern";
 import RGBColor from "../utils/RGBColor";
-import Led, { Coordinate } from "../utils/Led";
 import LedCanvasPreview, { LOOP_HEIGHT, LOOP_WIDTH, LOOP_LED_COUNT } from "../utils/LedCanvasPreview/LedCanvasPreview";
 import BlinkLedCanvasPreview from "../utils/LedCanvasPreview/BlinkLedCanvasPreview";
 import ChaseLedCanvasPreview from "../utils/LedCanvasPreview/ChaseLedCanvasPreview";

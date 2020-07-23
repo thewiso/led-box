@@ -8,21 +8,29 @@
 .color-add-button-container {
   padding-top: 16px;
 }
+.configuration-container {
+  margin-top: 56px;
+}
 </style>
 
 <template>
   <v-card>
-    <v-toolbar color="primary">
+    <v-app-bar color="primary" fixed>
       <v-btn icon @click="$emit('configurationFinished')">
-        <v-icon>mdi-close</v-icon>
+        <v-icon large>mdi-close</v-icon>
       </v-btn>
-      <v-toolbar-title>Settings</v-toolbar-title>
+      <v-toolbar-title>Edit Pattern</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-items>
-        <v-btn text @click="$emit('configurationFinished')">Save</v-btn>
+        <v-btn icon @click="$emit('configurationFinished')">
+          <v-icon large>mdi-content-save-outline</v-icon>
+        </v-btn>
+        <v-btn icon @click="$emit('configurationFinished')">
+          <v-icon large>mdi-play-circle-outline</v-icon>
+        </v-btn>
       </v-toolbar-items>
-    </v-toolbar>
-    <v-container>
+    </v-app-bar>
+    <v-container class="configuration-container">
       <v-row>
         <v-col cols="12">
           <v-card color="secondary">
@@ -39,13 +47,17 @@
                 <v-col cols="12" v-for="(color, index) in ledPattern.colors" :key="index">
                   <v-card :color="color.toString()" shaped>
                     <v-card-actions>
-                      <div class="text-h6 led-color-number" v-text="index + 1 + '.'"></div>
+                      <div
+                        class="text-h6 led-color-number"
+                        v-text="index + 1 + '.'"
+                        :style="{ color: getContrastFontColor(color).toString() }"
+                      ></div>
                       <v-spacer></v-spacer>
-                      <v-btn icon @click="openPickColorDialog(index)">
-                        <v-icon>mdi-pencil-outline</v-icon>
+                      <v-btn icon @click="openPickColorDialog(createColorIdentifier(index))">
+                        <v-icon :color="getContrastFontColor(color).toString()">mdi-pencil-outline</v-icon>
                       </v-btn>
                       <v-btn icon :disabled="!ledPattern.canRemoveColor()" @click="removeColor(index)">
-                        <v-icon>mdi-trash-can-outline</v-icon>
+                        <v-icon :color="getContrastFontColor(color).toString()">mdi-trash-can-outline</v-icon>
                       </v-btn>
                     </v-card-actions>
                   </v-card>
@@ -59,7 +71,7 @@
                     color="accent"
                     small
                     class="add-color-fab"
-                    @click="openPickColorDialog()"
+                    @click="openPickColorDialog(addColorIdentifier)"
                     v-if="ledPattern.canAddColor()"
                   >
                     <v-icon>mdi-plus</v-icon>
@@ -104,7 +116,7 @@
             <v-card-text>
               <v-row>
                 <v-col cols="12">
-                  <v-radio-group v-model="ledPattern.animationType" row>
+                  <v-radio-group v-model="ledPattern.animationType" column>
                     <v-radio label="No Animation" :value="animationTypeEnum.None"></v-radio>
                     <v-radio label="Blink" :value="animationTypeEnum.Blink"></v-radio>
                     <v-radio label="Chase" :value="animationTypeEnum.Chase"></v-radio>
@@ -163,9 +175,21 @@
                     <v-radio label="Use pattern as chase color" :value="true"></v-radio>
                     <v-radio label="Use pattern as background" :value="false"></v-radio>
                   </v-radio-group>
-                  <div v-if="!isPatternChaseColor">
-                    <v-btn depressed :color="ledPattern.chaseForeground.toString()">Normal</v-btn>
-                  </div>
+                  <v-row>
+                    <v-col cols="6">
+                      <v-card v-if="!isPatternChaseColor" :color="ledPattern.chaseForeground.toString()" shaped>
+                        <v-card-actions>
+                          <v-spacer></v-spacer>
+                          <v-btn icon @click="openPickColorDialog(editChaseForegroundColorIdentifier)">
+                            <v-icon :color="getContrastFontColor(ledPattern.chaseForeground).toString()">
+                              mdi-pencil-outline
+                            </v-icon>
+                          </v-btn>
+                          <v-spacer></v-spacer>
+                        </v-card-actions>
+                      </v-card>
+                    </v-col>
+                  </v-row>
                 </v-col>
               </v-row>
             </v-card-text>
@@ -177,12 +201,14 @@
       <v-card>
         <v-toolbar color="accent">
           <v-btn icon @click="closePickColorDialog()">
-            <v-icon>mdi-close</v-icon>
+            <v-icon large>mdi-close</v-icon>
           </v-btn>
           <v-toolbar-title>Pick Color</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-toolbar-items>
-            <v-btn text @click="closePickColorDialog(true)">Save</v-btn>
+            <v-btn icon @click="closePickColorDialog(true)">
+              <v-icon large>mdi-content-save-outline</v-icon>
+            </v-btn>
           </v-toolbar-items>
         </v-toolbar>
         <v-container>
@@ -219,6 +245,17 @@ import LedPattern, {
 import LedPreview from "./LedPreview.vue";
 import RGBColor from "../utils/RGBColor";
 
+class ColorIdentifier {
+  public static ADD_COLOR = new ColorIdentifier(-1);
+  public static EDIT_CHASE_FOREGROUND_COLOR = new ColorIdentifier(-2);
+
+  public index: number;
+
+  constructor(index: number) {
+    this.index = index;
+  }
+}
+
 export default Vue.extend({
   name: "PatternConfiguration",
   components: {
@@ -234,7 +271,7 @@ export default Vue.extend({
     ledPattern: new LedPattern(),
     pickColorDialogOpen: false,
     pickColorDialogColor: "",
-    pickColorDialogColorIndex: -1,
+    pickColorDialogColorIdentifier: ColorIdentifier.ADD_COLOR,
 
     //const values:
     minRepititonFactor: MIN_REPITION_FACTOR,
@@ -255,6 +292,9 @@ export default Vue.extend({
     maxChaseLengthFactor: MAX_CHASE_LENGTH_FACTOR,
     minChaseGradientLengthFactor: MIN_CHASE_GRADIENT_LENGTH_FACTOR,
     maxChaseGradientLengthFactor: MAX_COLOR_GRADIENT_LENGTH_FACTOR,
+
+    addColorIdentifier: ColorIdentifier.ADD_COLOR,
+    editChaseForegroundColorIdentifier: ColorIdentifier.EDIT_CHASE_FOREGROUND_COLOR,
   }),
   computed: {
     isPatternChaseColor: {
@@ -279,25 +319,32 @@ export default Vue.extend({
         return "Edit pattern";
       }
     },
-    openPickColorDialog(colorIndex?: number) {
+    openPickColorDialog(colorIdentifier: ColorIdentifier) {
       let color: string;
-      if (colorIndex === undefined) {
-        colorIndex = -1;
+      if (colorIdentifier === ColorIdentifier.ADD_COLOR) {
         color = DEFAULT_COLOR.toHex();
+      } else if (colorIdentifier === ColorIdentifier.EDIT_CHASE_FOREGROUND_COLOR) {
+        if (this.ledPattern.chaseForeground === undefined) {
+          color = RGBColor.White.toHex();
+        } else {
+          color = this.ledPattern.chaseForeground.toHex();
+        }
       } else {
-        color = this.ledPattern.colors[colorIndex].toHex();
+        color = this.ledPattern.colors[colorIdentifier.index].toHex();
       }
-      this.pickColorDialogColorIndex = colorIndex;
+      this.pickColorDialogColorIdentifier = colorIdentifier;
       this.pickColorDialogColor = color;
       this.pickColorDialogOpen = true;
     },
     closePickColorDialog(save?: boolean) {
       if (save) {
         const color = this.pickColorDialogColor;
-        if (this.pickColorDialogColorIndex === -1) {
+        if (this.pickColorDialogColorIdentifier === ColorIdentifier.ADD_COLOR) {
           this.ledPattern.addHexColor(color);
+        } else if (this.pickColorDialogColorIdentifier === ColorIdentifier.EDIT_CHASE_FOREGROUND_COLOR) {
+          this.ledPattern.chaseForeground = RGBColor.fromHex(color);
         } else {
-          this.ledPattern.setHexColor(this.pickColorDialogColorIndex, color);
+          this.ledPattern.setHexColor(this.pickColorDialogColorIdentifier.index, color);
         }
       }
       this.pickColorDialogOpen = false;
@@ -305,9 +352,20 @@ export default Vue.extend({
     removeColor(colorIndex: number) {
       this.ledPattern.removeColor(colorIndex);
     },
+    getContrastFontColor(color: RGBColor): RGBColor {
+      const colorAverage = (color.red + color.green + color.blue) / 3;
+      if (colorAverage < 128) {
+        return RGBColor.White;
+      } else {
+        return RGBColor.Black;
+      }
+    },
+    createColorIdentifier(index: number) {
+      return new ColorIdentifier(index);
+    },
   },
   watch: {
-    patternId: function(newVal, oldVal) {
+    patternId: function(newVal) {
       if (newVal === undefined) {
         this.ledPattern = new LedPattern();
       } else {

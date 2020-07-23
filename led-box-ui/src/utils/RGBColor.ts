@@ -1,4 +1,3 @@
-
 export default class RGBColor {
   protected _red = 0;
   protected _green = 0;
@@ -70,7 +69,7 @@ export default class RGBColor {
     return Math.round((1 - factor) * primaryColor1 + factor * primaryColor2);
   }
 
-  public static fromHex(hex: string): null | RGBColor {
+  public static fromHex(hex: string): RGBColor | undefined {
     if (hex.startsWith("#")) {
       hex = hex.substring(1);
     }
@@ -85,7 +84,7 @@ export default class RGBColor {
       }
     }
 
-    return null;
+    return undefined;
   }
 
   public static fromString(colorString: string): RGBColor | null {
