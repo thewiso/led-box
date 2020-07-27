@@ -12,8 +12,10 @@
 #define LED_PIN D2
 #define BUTTON_PIN D1
 //https://arduinojson.org/v6/assistant/ => 812 was the tested value
+//TODO: check this value again
 #define JSON_SIZE 812
 #define INVALID_PRIMARY_COLOR -1
+#define JSON_FILE_EXTENSION ".json"
 
 //TODO: check which can be defined instead of beeing global vars
 const char* SSID = "LED-MANAGER";
@@ -135,6 +137,7 @@ void setupServer() {
 	});
 	//api led post
 	webServer.on("/led-pattern", HTTP_POST, postLedPattern);
+	webServer.on("/led-pattern", HTTP_GET, getLedPattern);
 
 	webServer.begin();
 
@@ -150,12 +153,10 @@ void postLedPattern() {
 		bool parsingSuccess = parseRequestLedPattern(requestDoc, parsedDoc);
 		if(parsingSuccess) {
 			webServer.send(201);
-			Serial.println(parsedDoc["name"].as<char*>());
-			Serial.println(parsedDoc["colors"].as<JsonArray>().size());
-
 			parsedDoc["id"] = newPatternIndex;
 
-			File newPatternFile = SD.open(newPatternIndex + ".txt", FILE_WRITE);
+			String fileExtension = JSON_FILE_EXTENSION;
+			File newPatternFile = SD.open(LED_PATTERN_DIR_STR + newPatternIndex + fileExtension, FILE_WRITE);
 			serializeJson(parsedDoc, newPatternFile);
 			newPatternFile.close();
 
@@ -172,6 +173,35 @@ void postLedPattern() {
 	} else {
 		webServer.send(400);
 	}
+}
+
+void getLedPattern() {
+	webServer.chunkedResponseModeStart(200, "text/json");
+	webServer.sendContent("[");
+
+	patternDir.rewindDirectory();
+	File patternFile = patternDir.openNextFile();
+
+	while(patternFile) {
+		if(!patternFile.isDirectory()) {
+			String stringBuffer = "";
+			while (patternFile.available())
+			{
+				stringBuffer += (char)patternFile.read();
+				if(stringBuffer.length() >= 1000) {
+					webServer.sendContent(stringBuffer);
+					stringBuffer = "";
+				}
+			}
+			webServer.sendContent(stringBuffer);
+			webServer.sendContent(",");
+		}
+
+		patternFile = patternDir.openNextFile();
+	}
+
+	webServer.sendContent("]");
+	webServer.chunkedResponseFinalize();
 }
 
 bool parseRequestLedPattern(JsonDocument &rawDoc, JsonDocument &parsedDoc) {
@@ -222,7 +252,7 @@ bool parseRequestLedPattern(JsonDocument &rawDoc, JsonDocument &parsedDoc) {
 	if(animationTypeVar.isNull() || !animationTypeVar.is<String>()) {
 		return false;
 	}
-    
+
 	String animationType = animationTypeVar.as<String>();
 	if(animationType.equals("none")) {
 		//all good
@@ -261,14 +291,14 @@ bool parseColor(JsonVariant &rawColorVar, JsonObject &parsedColor) {
 		const byte attrNamesLength = 3;
 		String attrNames[attrNamesLength] = {"r", "g", "b"};
 
-		for(byte i=0; i < attrNamesLength; i++) {
+		for(char i=0; i < attrNamesLength; i++) {
 			bool parseSuccess = parseNumberAttr(rawColor, parsedColor, attrNames[i], 0, 255);
-			if(parseSuccess) {
-				return true;
+			if(!parseSuccess) {
+				return false;
 			}
 		}
 	}
-	return false;
+	return true;
 }
 
 template<typename T>
