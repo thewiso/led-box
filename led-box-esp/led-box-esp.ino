@@ -7,6 +7,7 @@
 #include <ArduinoJson.h>
 #include <SPI.h>
 #include <SD.h>
+#include <uri/UriBraces.h>
 
 #define BUTTON_SWITCH_PIN D3
 #define LED_PIN D2
@@ -31,7 +32,7 @@ DNSServer dnsServer;
 SoftwareSerial ledClientSerial(1, 2); //RX, TX ; 2 is D4 //TODO: mark 1 as unused
 File patternDir;
 bool shutdownRequested = false;
-short newPatternIndex = 1;
+unsigned short newPatternId = 1;
 
 void ICACHE_RAM_ATTR onButtonPress();
 
@@ -115,7 +116,21 @@ void setupSD() {
 		Serial.println("Could not connect to SD");
 	}
 
-	if(error) {
+	if(!error) {
+		//Finding out highest existing pattern id
+		File patternFile =  patternDir.openNextFile();
+		while(patternFile) {
+			String fileName = patternFile.name();
+			if(!patternFile.isDirectory() && fileName.endsWith(JSON_FILE_EXTENSION)) {
+				fileName.replace(JSON_FILE_EXTENSION, "");
+				unsigned short patternId = fileName.toInt();
+				if(patternId >= newPatternId) {
+					newPatternId = patternId + 1;
+				}
+			}
+			patternFile = patternDir.openNextFile();
+		}
+	} else {
 		//TODO: warning lamp? power off?
 		Serial.println("Could not init SD");
 	}
@@ -135,9 +150,10 @@ void setupServer() {
 		webServer.send(200, "text/html",
 		               "Hello World");
 	});
-	//api led post
-	webServer.on("/led-pattern", HTTP_POST, postLedPattern);
-	webServer.on("/led-pattern", HTTP_GET, getLedPattern);
+	//REST API
+	webServer.on("/led-patterns", HTTP_POST, postLedPattern);
+	webServer.on("/led-patterns", HTTP_GET, getLedPattern);
+	webServer.on(UriBraces("/led-patterns/{}"), HTTP_PATCH, patchLedPattern);
 
 	webServer.begin();
 
@@ -152,24 +168,18 @@ void postLedPattern() {
 		StaticJsonDocument<JSON_SIZE> parsedDoc;
 		bool parsingSuccess = parseRequestLedPattern(requestDoc, parsedDoc);
 		if(parsingSuccess) {
-			webServer.send(201);
-			parsedDoc["id"] = newPatternIndex;
+			parsedDoc["id"] = newPatternId;
 
 			String fileExtension = JSON_FILE_EXTENSION;
-			File newPatternFile = SD.open(LED_PATTERN_DIR_STR + newPatternIndex + fileExtension, FILE_WRITE);
+			File newPatternFile = SD.open(LED_PATTERN_DIR_STR + newPatternId + fileExtension, FILE_WRITE);
 			serializeJson(parsedDoc, newPatternFile);
 			newPatternFile.close();
+			webServer.send(201, "text/json", String(newPatternId));
 
-			newPatternIndex++;
+			newPatternId++;
 		} else {
 			webServer.send(400);
 		}
-		//const char* colorName = doc["color"];
-
-		//ledClientSerial.print(body);
-		//ledClientSerial.print('\0');
-
-
 	} else {
 		webServer.send(400);
 	}
@@ -196,12 +206,55 @@ void getLedPattern() {
 			webServer.sendContent(stringBuffer);
 			webServer.sendContent(",");
 		}
-
 		patternFile = patternDir.openNextFile();
 	}
 
 	webServer.sendContent("]");
 	webServer.chunkedResponseFinalize();
+}
+
+void patchLedPattern() {
+	StaticJsonDocument<JSON_SIZE> requestDoc;
+	String body = webServer.arg("plain");
+
+	DeserializationError error = deserializeJson(requestDoc, body);
+	if (!error) {
+		StaticJsonDocument<JSON_SIZE> parsedDoc;
+		bool parsingSuccess = parseRequestLedPattern(requestDoc, parsedDoc);
+		if(parsingSuccess) {
+			String idStr = webServer.pathArg(0);
+			unsigned short id = idStr.toInt();
+			if(id > 0) {
+				String fileExtension = JSON_FILE_EXTENSION;
+				String fileName = LED_PATTERN_DIR_STR + idStr.toInt() + fileExtension;
+				if(SD.exists(fileName)) {
+                    parsedDoc["id"] = id;
+                    
+					SD.remove(fileName);
+					File patternFile = SD.open(fileName, FILE_WRITE);
+					serializeJson(parsedDoc, patternFile);
+					patternFile.close();
+                    
+                    webServer.send(200);
+				} else {
+					webServer.send(404);
+				}
+
+			} else {
+				webServer.send(400);
+			}
+		} else {
+			webServer.send(400);
+		}
+		//const char* colorName = doc["color"];
+
+		//ledClientSerial.print(body);
+		//ledClientSerial.print('\0');
+
+
+	} else {
+		webServer.send(400);
+	}
 }
 
 bool parseRequestLedPattern(JsonDocument &rawDoc, JsonDocument &parsedDoc) {
