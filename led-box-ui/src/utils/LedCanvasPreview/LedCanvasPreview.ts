@@ -117,7 +117,12 @@ export default class LedCanvasPreview {
       let currentColorIndex = Math.floor(i / ledCountPerColorInRepition) % colorCount;
       const indexInRepition = i % ledCountPerColorInRepition;
 
-      if (colorGradientLengthFactor === 0 && repitionFactor === 0 && currentColorIndex === 0 && i > ledCountPerColorInRepition) {
+      if (
+        colorGradientLengthFactor === 0 &&
+        repitionFactor === 0 &&
+        currentColorIndex === 0 &&
+        i > ledCountPerColorInRepition
+      ) {
         //a bit hacky, but otherwise the preview looks off
         currentColorIndex = colorCount - 1;
       }
@@ -143,14 +148,6 @@ export default class LedCanvasPreview {
 
       this.leds[i].color = currentColor;
     }
-
-    //TODO:
-    // if (this.ledPattern.repitionFactor === 0 && this.ledPattern.colorGradientLengthFactor === 0) {
-    //   const lastColor = this.leds[this.leds.length - 1].color;
-    //   while (this.leds.length < this.ledCount) {
-    //     this.ledColors.push(lastColor);
-    //   }
-    // }
   }
 
   private pushLedArrayPath(count: number, currentPos: Coordinate, translation: Coordinate) {

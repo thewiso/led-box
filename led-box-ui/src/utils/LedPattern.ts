@@ -31,7 +31,6 @@ export enum AnimationType {
   Blink,
   Chase,
 }
-//TODO: implemented model logic in extra class?
 export default class LedPattern {
   private _colors: RGBColor[];
   private _repitionFactor: number;

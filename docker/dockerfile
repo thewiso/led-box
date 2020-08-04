@@ -1,0 +1,25 @@
+FROM python:3-buster
+
+ARG RUNTIME_USER=runtime-user
+
+RUN apt-get update
+RUN apt-get install git nginx gettext -y
+RUN pip install uwsgi flask
+
+COPY nginx-config /etc/nginx/sites-available/led-box
+RUN export API_SERVER_DIR="/home/${RUNTIME_USER}/led-box/led-box-api-server/led-box-api-server.sock"
+RUN envsubst < /etc/nginx/sites-available/led-box
+RUN ln -s /etc/nginx/sites-available/led-box /etc/nginx/sites-enabled
+
+RUN adduser --disabled-password ${RUNTIME_USER} --ingroup www-data --system
+USER ${RUNTIME_USER}
+
+WORKDIR /home/${RUNTIME_USER}
+RUN pwd
+RUN git clone https://github.com/thewiso/led-box.git led-box
+WORKDIR /home/${RUNTIME_USER}/led-box/led-box-api-server
+RUN pip install -r requirements.txt
+
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

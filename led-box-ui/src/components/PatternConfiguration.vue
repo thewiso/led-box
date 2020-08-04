@@ -224,7 +224,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue"; //TODO: font color contrast in buttons for color picking
+import Vue from "vue";
 import LedPattern, {
   MIN_REPITION_FACTOR,
   MAX_REPITION_FACTOR,
