@@ -1,25 +1,30 @@
 FROM python:3-buster
+EXPOSE 80
 
-ARG RUNTIME_USER=runtime-user
+ENV RUNTIME_USER=runtime-user
+ENV LED_BOX_DIR=/opt/led-box-api-server
+ENV API_SERVER_DIR=${LED_BOX_DIR}/led-box/led-box-api-server
 
 RUN apt-get update
 RUN apt-get install git nginx gettext -y
 RUN pip install uwsgi flask
 
+#NGINX CONFIG
 COPY nginx-config /etc/nginx/sites-available/led-box
-RUN export API_SERVER_DIR="/home/${RUNTIME_USER}/led-box/led-box-api-server/led-box-api-server.sock"
-RUN envsubst < /etc/nginx/sites-available/led-box
+RUN envsubst < /etc/nginx/sites-available/led-box > /etc/nginx/sites-available/led-box.tmp 
+RUN mv /etc/nginx/sites-available/led-box.tmp /etc/nginx/sites-available/led-box
 RUN ln -s /etc/nginx/sites-available/led-box /etc/nginx/sites-enabled
 
-RUN adduser --disabled-password ${RUNTIME_USER} --ingroup www-data --system
-USER ${RUNTIME_USER}
-
-WORKDIR /home/${RUNTIME_USER}
-RUN pwd
-RUN git clone https://github.com/thewiso/led-box.git led-box
-WORKDIR /home/${RUNTIME_USER}/led-box/led-box-api-server
+#CLONE
+RUN mkdir -p ${LED_BOX_DIR}
+RUN git clone https://github.com/thewiso/led-box.git ${LED_BOX_DIR}/led-box
+WORKDIR ${LED_BOX_DIR}/led-box/led-box-api-server
 RUN pip install -r requirements.txt
+RUN cp ${LED_BOX_DIR}/led-box/docker/start-component.sh start-component.sh
+RUN chmod u+x start-component.sh
 
+#USER
+RUN adduser --disabled-password ${RUNTIME_USER} --ingroup www-data --system
+RUN chown -R ${RUNTIME_USER} ${API_SERVER_DIR}
 
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+CMD start-component.sh
