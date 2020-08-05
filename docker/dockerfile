@@ -7,7 +7,6 @@ ENV API_SERVER_DIR=${LED_BOX_DIR}/led-box-api-server
 
 RUN apt-get update
 RUN apt-get install git nginx gettext -y
-RUN pip install uwsgi flask
 
 #NGINX CONFIG
 COPY nginx-config /etc/nginx/sites-available/led-box
