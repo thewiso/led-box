@@ -1,17 +1,16 @@
 import connexion
-from connexion.apis.aiohttp_api import HTTPStatus
 from .model.led_pattern import LEDPattern
 from db import led_box_db
 import json
 from typing import Tuple, Any, List
 
 
-def create_pattern(body: dict) -> Tuple[int, HTTPStatus]:
+def create_pattern(body: dict):
     id = led_box_db.insert_pattern(body)
     return id, 201
 
 
-def get_patterns() -> Tuple[List[dict], HTTPStatus]:
+def get_patterns():
     return led_box_db.get_patterns()
 
 
@@ -28,7 +27,7 @@ def run_pattern(body=None):
     return 'do some magic!'
 
 
-def update_pattern(id_: int, body: dict) -> Tuple[None, HTTPStatus]:
+def update_pattern(id_: int, body: dict):
     if led_box_db.is_pattern_existing(id_):
         led_box_db.update_pattern(id_, body)
         return None, 200
