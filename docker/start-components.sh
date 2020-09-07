@@ -1,4 +1,4 @@
-su ${RUNTIME_USER} -c 'uwsgi --ini led_box_api_server.ini > /dev/null'  &
+su ${RUNTIME_USER} -c 'uwsgi --ini led_box_backend.ini > /dev/null'  &
 sleep 5s
 
 nginx -g 'daemon off;'

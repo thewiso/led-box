@@ -3,7 +3,7 @@ EXPOSE 80
 
 ENV RUNTIME_USER=runtime-user
 ENV LED_BOX_DIR=/opt/led-box
-ENV API_SERVER_DIR=${LED_BOX_DIR}/led-box-api-server
+ENV API_SERVER_DIR=${LED_BOX_DIR}/led-box-backend
 
 RUN apt-get update
 RUN apt-get install git nginx gettext -y
@@ -25,5 +25,6 @@ RUN cp ${LED_BOX_DIR}/docker/start-components.sh start-components.sh
 RUN adduser ${RUNTIME_USER} --ingroup www-data --disabled-password --gecos ""
 RUN chown -R ${RUNTIME_USER} ${API_SERVER_DIR}
 RUN chmod u+x start-components.sh
+USER ${RUNTIME_USER}
 
 CMD ./start-components.sh
