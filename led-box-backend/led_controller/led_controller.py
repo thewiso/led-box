@@ -105,7 +105,10 @@ def fill_and_show_leds(led_colors: list):
     leds.show()
 
 
-json_str = """{
+def start_pattern_
+
+
+json_str_none = """{
     "name": "tobi",
     "colors": [
         {
@@ -129,7 +132,33 @@ json_str = """{
     "animationType": "none"
 }"""
 
-led_pattern = json.loads(json_str)
+json_str_blink = """{
+    "name": "tobi",
+    "colors": [
+        {
+            "r": 255,
+            "g": 0,
+            "b": 0
+        },
+        {
+            "r": 0,
+            "g": 255,
+            "b": 0
+        },
+        {
+            "r": 0,
+            "g": 0,
+            "b": 255
+        }
+    ],
+    "repitionFactor": 0,
+    "colorGradientLengthFactor": 0.3,
+    "animationType": "blink",
+    "blinkSpeed": 0.5,
+    "blinkDimmingPeriodFactor": 0.5
+}"""
+
+led_pattern = json.loads(json_str_none)
 led_color_list = create_led_color_list(led_pattern)
 fill_and_show_leds(led_color_list)
 
