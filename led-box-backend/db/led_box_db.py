@@ -13,6 +13,9 @@ select_all_patterns = 'SELECT * FROM LED_PATTERN'
 select_last_insert_rowid = 'SELECT last_insert_rowid()'
 select_led_pattern_table = 'SELECT count(*) FROM sqlite_master WHERE name = \'LED_PATTERN\''
 
+
+#TODO: class
+
 # INIT CONNECTION AND DB
 connection = sqlite3.connect('led_box.sqlite', check_same_thread=False)
 
