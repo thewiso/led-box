@@ -7,11 +7,14 @@ from api.model.led_pattern import LEDPattern
 from led_controller.pattern_animator import PatternAnimator
 from led_controller.pattern_animator_none import PatternAnimatorNone
 from led_controller.pattern_animator_blink import PatternAnimatorBlink
+import logging
+
 
 
 # TODO: some logging in all classes
 
 pattern_animator: PatternAnimator = None
+LOG = logging.getLogger('Controller')
 
 
 # TODO: init
@@ -32,7 +35,7 @@ def start_pattern_display(led_pattern: LEDPattern):
 		pattern_animator = PatternAnimatorNone(leds, led_pattern)
 	elif(led_pattern.animation_type == "blink"):
 		pattern_animator = PatternAnimatorBlink(leds, led_pattern)
-
+	LOG.warning(led_pattern.animation_type)
 	pattern_animator.start()
 
 
@@ -82,9 +85,14 @@ json_str_blink = """{
 	"repitionFactor": 0,
 	"colorGradientLengthFactor": 0.3,
 	"animationType": "blink",
-	"blinkSpeed": 0.5,
-	"blinkDimmingPeriodFactor": 0.5
+	"blinkSpeed": 0.1,
+	"blinkDimmingPeriodFactor": 
 }"""
 
-led_pattern = json.loads(json_str_none)
+#led_pattern_dict = json.loads(json_str_none)
+led_pattern_dict = json.loads(json_str_blink)
+led_pattern = LEDPattern.from_dict(led_pattern_dict)
+
+leds.brightness = 0.01
+
 start_pattern_display(led_pattern)
