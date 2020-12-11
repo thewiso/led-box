@@ -11,6 +11,7 @@ class PatternAnimatorBlink(PatternAnimator):
 	LOG = logging.getLogger('PatternAnimatorBlink')
 
 	GAMMA_CORRECTION = 1 / 2.2
+	GAMMA_CORRECTION_RECIPROCAL = 1 / GAMMA_CORRECTION
 
 	#The LED strip will not show pretty or any colors below this threshold
 	MIN_BRIGHTNESS = 0.05
@@ -64,8 +65,7 @@ class PatternAnimatorBlink(PatternAnimator):
 				brightness = 1 - brightness
 			
 			#https://www.mikrocontroller.net/articles/Diskussion:LED-Fading#Diskussion_wissenschaftl.-technischer_Hintergrund
-			brightness = brightness ** ( 1 / PatternAnimatorBlink.GAMMA_CORRECTION)
-
+			brightness = brightness ** PatternAnimatorBlink.GAMMA_CORRECTION_RECIPROCAL
 			#map brightness' value (which is currently between 0 and 1) to the proportional value between MIN_BRIGHTNESS and 1
 			if brightness == 0:
 			 	brightness = PatternAnimatorBlink.MIN_BRIGHTNESS
