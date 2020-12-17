@@ -12,4 +12,4 @@ class PatternAnimatorNone(PatternAnimator):
 		self.fill_and_show_leds(self.led_color_list)
 	
 	def stop(self):
-		pass
+		self.clear_leds()

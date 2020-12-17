@@ -47,6 +47,7 @@ class PatternAnimatorBlink(PatternAnimator):
 				self.timer.cancel()
 			
 			self.leds.brightness = 1
+			self.clear_leds()
 
 	def blink(self, current_blink_state, next_toggle_timestamp):
 		brightness = None

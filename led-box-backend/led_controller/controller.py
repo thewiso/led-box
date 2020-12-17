@@ -40,7 +40,7 @@ def start_pattern_display(led_pattern: LEDPattern):
 
 
 json_str_none = """{
-	"name": "tobi",
+	"name": "none_animation",
 	"colors": [
 		{
 			"r": 255,
@@ -64,7 +64,7 @@ json_str_none = """{
 }"""
 
 json_str_blink = """{
-	"name": "tobi",
+	"name": "blink_animation",
 	"colors": [
 		{
 			"r": 255,
@@ -89,8 +89,41 @@ json_str_blink = """{
 	"blinkDimmingPeriodFactor": 
 }"""
 
+json_str_chase = """{
+	"name": "chase_animation",
+	"colors": [
+		{
+			"r": 255,
+			"g": 0,
+			"b": 0
+		},
+		{
+			"r": 0,
+			"g": 255,
+			"b": 0
+		},
+		{
+			"r": 0,
+			"g": 0,
+			"b": 255
+		}
+	],
+	"repitionFactor": 0,
+	"colorGradientLengthFactor": 0.3,
+	"animationType": "chase",
+	"chase_speed": 1,
+	"chase_length_factor": 0.2,
+    "chase_gradient_length_factor": 0.25,
+	"chase_foreground": {
+		"r": 0,
+		"g": 0,
+		"b": 255,
+	}
+}"""
+
 #led_pattern_dict = json.loads(json_str_none)
-led_pattern_dict = json.loads(json_str_blink)
+#led_pattern_dict = json.loads(json_str_blink)
+led_pattern_dict = json.loads(json_str_chase)
 led_pattern = LEDPattern.from_dict(led_pattern_dict)
 
 leds.brightness = 0.01
