@@ -135,14 +135,15 @@ export default class ChaseLedCanvasPreview extends LedCanvasPreview {
     }
 
     if (this.chaseGradientLength > 0 && this.chaseLength > 1) {
-      const chaseGradientStart = this.chaseLength - this.chaseGradientLength;
+	  const risingGradientExclusiveEndIndex = this.chaseGradientLength
+      const descendingGradientStartIndex = this.chaseLength - this.chaseGradientLength;
 
       return (led: Led, chaseIndex: number) => {
         let alpha = null as number | null;
-        if (chaseIndex < this.chaseGradientLength) {
+        if (chaseIndex < risingGradientExclusiveEndIndex) {
           alpha = (chaseIndex + 1) / (this.chaseGradientLength + 1);
-        } else if (chaseIndex >= chaseGradientStart) {
-          alpha = (chaseGradientStart + this.chaseGradientLength - chaseIndex) / (this.chaseGradientLength + 1);
+        } else if (chaseIndex >= descendingGradientStartIndex) {
+          alpha = (descendingGradientStartIndex + this.chaseGradientLength - chaseIndex) / (this.chaseGradientLength + 1);
         }
 
         if (alpha === null) {
