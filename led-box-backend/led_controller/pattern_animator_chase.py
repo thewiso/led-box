@@ -5,7 +5,7 @@ import threading
 import time
 import logging
 import math
-from collections.abc import Callable
+from typing import Tuple, Callable
 
 
 class PatternAnimatorChase(PatternAnimator):
@@ -77,12 +77,12 @@ class PatternAnimatorChase(PatternAnimator):
 			self.timer.start()
 
 	# callable signature: chase_index, led_index, returns color tuple
-	def create_chase_color_provider(self) -> Callable[int, int, tuple[int, int, int]]:
+	def create_chase_color_provider(self) -> Callable[int, int, Tuple[int, int, int]]:
 		if self.chase_gradient_length > 0 and self.chase_length > 1:
 			rising_gradient_exclusive_end_index = self.chase_gradient_length
 			descending_gradient_start_index = self.chase_length - self.chase_gradient_length
 
-			def get_chase_color(chase_index: int, led_index: int) -> tuple[int, int, int]:
+			def get_chase_color(chase_index: int, led_index: int) -> Tuple[int, int, int]:
 				merge_factor = None
 				if chase_index < rising_gradient_exclusive_end_index:
 					merge_factor = (chase_index + 1) / \
@@ -97,7 +97,7 @@ class PatternAnimatorChase(PatternAnimator):
 					return self.merge_color_tuples(self.chase_color_list[chase_index], self.background_color_list[chase_index], merge_factor)
 
 		else:
-			def get_chase_color(chase_index: int, led_index: int) -> tuple[int, int, int]:
+			def get_chase_color(chase_index: int, led_index: int) -> Tuple[int, int, int]:
 				return self.chase_color_list[chase_index]
 
 		return get_chase_color

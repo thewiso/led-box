@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import adafruit_ws2801
 from api.model.led_pattern import LEDPattern, Color
 import math
+from typing import Tuple
 
 
 class PatternAnimator(ABC):
@@ -80,7 +81,7 @@ class PatternAnimator(ABC):
                         current_color, next_color, gradient_factor)
             self.led_color_list.append(current_color)
 
-    def merge_color_tuples(self, color_1: tuple, color_2: tuple, factor: float) -> tuple[int, int, int]:
+    def merge_color_tuples(self, color_1:  Tuple[int, int, int], color_2:  Tuple[int, int, int], factor: float) -> Tuple[int, int, int]:
         return (
             self.merge_primary_color(color_1[0], color_2[0], factor),
             self.merge_primary_color(color_1[1], color_2[1], factor),
@@ -90,10 +91,10 @@ class PatternAnimator(ABC):
     def merge_primary_color(self, primary_color_1: int, primary_color_2: int, factor: float) -> int:
         return round((1 - factor) * primary_color_1 + factor * primary_color_2)
 
-    def get_color_tuple_from_led_pattern_colors(self, index: int) -> tuple[int, int, int]:
+    def get_color_tuple_from_led_pattern_colors(self, index: int) -> Tuple[int, int, int]:
         return self.get_color_tuple_from_color_object(self.led_pattern.colors[index])
 
-    def get_color_tuple_from_color_object(self, color: Color) -> tuple[int, int, int]:
+    def get_color_tuple_from_color_object(self, color: Color) -> Tuple[int, int, int]:
         return (
             color.r,
             color.g,
