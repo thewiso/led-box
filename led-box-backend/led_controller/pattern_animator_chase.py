@@ -42,7 +42,7 @@ class PatternAnimatorChase(PatternAnimator):
 		self.fill_and_show_leds(self.background_color_list)
 
 		with self.timer_lock:
-			self.timer = threading.Timer(0.1, self.chase, args=(0))
+			self.timer = threading.Timer(0.1, self.chase, args=(0, int(round(time.time() * 1000))))
 			self.timer.start()
 
 	def stop(self):
@@ -54,8 +54,6 @@ class PatternAnimatorChase(PatternAnimator):
 
 	def chase(self, previous_chase_start_index: int, previous_time_stamp: int):
 		timestamp = int(round(time.time() * 1000))
-		if (previous_time_stamp == None):
-			previous_time_stamp = timestamp
 
 		elapsed = timestamp - previous_time_stamp
 		elapsed_steps = round(elapsed / self.chase_step_duration)
@@ -71,13 +69,15 @@ class PatternAnimatorChase(PatternAnimator):
 			previous_time_stamp = timestamp
 			previous_chase_start_index = chase_start_index
 
+			self.leds.show()
+			
 		with self.timer_lock:
 			self.timer = threading.Timer(0.01, self.chase, args=(
 				previous_chase_start_index, previous_time_stamp))
 			self.timer.start()
 
 	# callable signature: chase_index, led_index, returns color tuple
-	def create_chase_color_provider(self) -> Callable[int, int, Tuple[int, int, int]]:
+	def create_chase_color_provider(self) -> Callable[[int, int], Tuple[int, int, int]]:
 		if self.chase_gradient_length > 0 and self.chase_length > 1:
 			rising_gradient_exclusive_end_index = self.chase_gradient_length
 			descending_gradient_start_index = self.chase_length - self.chase_gradient_length
@@ -92,13 +92,13 @@ class PatternAnimatorChase(PatternAnimator):
 									chase_index) / (self.chase_gradient_length + 1)
 
 				if merge_factor is None:
-					return self.chase_color_list[chase_index]
+					return self.chase_color_list[led_index]
 				else:
-					return self.merge_color_tuples(self.chase_color_list[chase_index], self.background_color_list[chase_index], merge_factor)
+					return self.merge_color_tuples(self.background_color_list[led_index], self.chase_color_list[led_index], merge_factor)
 
 		else:
 			def get_chase_color(chase_index: int, led_index: int) -> Tuple[int, int, int]:
-				return self.chase_color_list[chase_index]
+				return self.chase_color_list[led_index]
 
 		return get_chase_color
 

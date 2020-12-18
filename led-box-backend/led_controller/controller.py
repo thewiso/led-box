@@ -7,6 +7,7 @@ from api.model.led_pattern import LEDPattern
 from led_controller.pattern_animator import PatternAnimator
 from led_controller.pattern_animator_none import PatternAnimatorNone
 from led_controller.pattern_animator_blink import PatternAnimatorBlink
+from led_controller.pattern_animator_chase import PatternAnimatorChase
 import logging
 
 
@@ -23,7 +24,7 @@ leds = adafruit_ws2801.WS2801(
 leds.deinit()
 leds = adafruit_ws2801.WS2801(
 	board.SCK, board.MOSI, PatternAnimator.LED_COUNT, auto_write=False)
-
+leds.brightness = 1
 
 
 def start_pattern_display(led_pattern: LEDPattern):
@@ -35,6 +36,8 @@ def start_pattern_display(led_pattern: LEDPattern):
 		pattern_animator = PatternAnimatorNone(leds, led_pattern)
 	elif(led_pattern.animation_type == "blink"):
 		pattern_animator = PatternAnimatorBlink(leds, led_pattern)
+	elif(led_pattern.animation_type == "chase"):
+		pattern_animator = PatternAnimatorChase(leds, led_pattern)
 	LOG.warning(led_pattern.animation_type)
 	pattern_animator.start()
 
@@ -59,7 +62,7 @@ json_str_none = """{
 		}
 	],
 	"repitionFactor": 0,
-	"colorGradientLengthFactor": 0.3,
+	"colorGradientLengthFactor": 0.5,
 	"animationType": "none"
 }"""
 
@@ -111,21 +114,46 @@ json_str_chase = """{
 	"repitionFactor": 0,
 	"colorGradientLengthFactor": 0.3,
 	"animationType": "chase",
-	"chase_speed": 1,
-	"chase_length_factor": 0.2,
-    "chase_gradient_length_factor": 0.25,
-	"chase_foreground": {
+	"chaseSpeed": 1,
+	"chaseLengthFactor": 0.2,
+    "chaseGradientLengthFactor": 0.25,
+	"chaseForeground": {
 		"r": 0,
 		"g": 0,
-		"b": 255,
+		"b": 255
 	}
+}"""
+
+json_str_chase_2 = """{
+	"name": "chase_animation",
+	"colors": [
+		{
+			"r": 255,
+			"g": 0,
+			"b": 0
+		},
+		{
+			"r": 0,
+			"g": 255,
+			"b": 0
+		},
+		{
+			"r": 0,
+			"g": 0,
+			"b": 255
+		}
+	],
+	"repitionFactor": 0,
+	"colorGradientLengthFactor": 0.3,
+	"animationType": "chase",
+	"chaseSpeed": 50,
+	"chaseLengthFactor": 0.2,
+    "chaseGradientLengthFactor": 0.5
 }"""
 
 #led_pattern_dict = json.loads(json_str_none)
 #led_pattern_dict = json.loads(json_str_blink)
 led_pattern_dict = json.loads(json_str_chase)
 led_pattern = LEDPattern.from_dict(led_pattern_dict)
-
-leds.brightness = 0.01
 
 start_pattern_display(led_pattern)
