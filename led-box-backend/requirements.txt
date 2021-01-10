@@ -1,6 +1,5 @@
 #six==1.11.0
-#connexion==2.7.0
-#python_dateutil==2.8.1
+connexion==2.7.0
+python_dateutil==2.8.1
 #uwsgi==2.0.19.1
 adafruit-circuitpython-ws2801==0.10.3
-#adafruit-circuitpython-busdevice==5.0.2

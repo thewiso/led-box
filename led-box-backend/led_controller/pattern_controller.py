@@ -10,36 +10,33 @@ from led_controller.pattern_animator_blink import PatternAnimatorBlink
 from led_controller.pattern_animator_chase import PatternAnimatorChase
 import logging
 
-# TODO: some logging in all classes
-# TODO: typing in all classes
+# TODO: typing in all modules
 
+__LOG = logging.getLogger('PatternController')
+__pattern_animator = None
 
-class PatternController:
-    LOG = logging.getLogger('PatternController')
-
-    def __init__(self):
-        self.pattern_animator = None
-
-        self.leds = adafruit_ws2801.WS2801(
+__leds = adafruit_ws2801.WS2801(
             board.SCK, board.MOSI, PatternAnimator.LED_COUNT, auto_write=False)
-        self.leds.deinit()
-        self.leds = adafruit_ws2801.WS2801(
+__leds.deinit()
+__leds.leds = adafruit_ws2801.WS2801(
             board.SCK, board.MOSI, PatternAnimator.LED_COUNT, auto_write=False)
-        self.leds.brightness = 1
+__leds.leds.brightness = 1
 
-    def start_pattern_display(self, led_pattern: LEDPattern):
-        if self.pattern_animator is not None:
-            self.pattern_animator.stop()
+def start_pattern_display(self, led_pattern: LEDPattern):
+	global __pattern_animator
 
-        if(led_pattern.animation_type == "none"):
-            self.pattern_animator = PatternAnimatorNone(self.leds, led_pattern)
-        elif(led_pattern.animation_type == "blink"):
-            self.pattern_animator = PatternAnimatorBlink(
-                self.leds, led_pattern)
-        elif(led_pattern.animation_type == "chase"):
-            self.pattern_animator = PatternAnimatorChase(
-                self.leds, led_pattern)
+	if __pattern_animator is not None:
+		__pattern_animator.stop()
 
-        PatternController.LOG.info(
-            "Starting new animation: {}...".format(led_pattern.animation_type))
-        self.pattern_animator.start()
+	if(led_pattern.animation_type == "none"):
+		__pattern_animator = PatternAnimatorNone(__leds, led_pattern)
+	elif(led_pattern.animation_type == "blink"):
+		__pattern_animator = PatternAnimatorBlink(
+			__leds, led_pattern)
+	elif(led_pattern.animation_type == "chase"):
+		__pattern_animator = PatternAnimatorChase(
+			__leds, led_pattern)
+
+	__LOG.info(
+		"Starting new animation: {}...".format(led_pattern.animation_type))
+	__pattern_animator.start()

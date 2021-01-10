@@ -32,6 +32,7 @@ class PatternAnimatorBlink(PatternAnimator):
 		self.timer_lock = threading.Lock()
 
 	def start(self):
+		PatternAnimatorBlink.LOG.debug("Starting pattern animation...")
 		self.clear_leds()
 
 		self.leds.brightness = 0
@@ -40,14 +41,17 @@ class PatternAnimatorBlink(PatternAnimator):
 		with self.timer_lock:
 			self.timer = threading.Timer(0.1, self.blink, args=(False, 0))
 			self.timer.start()
+		PatternAnimatorBlink.LOG.debug("Started pattern animation")
 
 	def stop(self):
+		PatternAnimatorBlink.LOG.debug("Stopping pattern animation...")
 		if(self.timer is not None):
 			with self.timer_lock:
 				self.timer.cancel()
 			
 			self.leds.brightness = 1
 			self.clear_leds()
+		PatternAnimatorBlink.LOG.debug("Stopped pattern animation")
 
 	def blink(self, current_blink_state, next_toggle_timestamp):
 		brightness = None
