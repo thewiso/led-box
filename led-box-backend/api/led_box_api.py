@@ -4,6 +4,7 @@ from db import led_box_db
 import json
 from typing import Tuple, Any, List
 import logging
+import led_controller.pattern_controller as pattern_controller
 
 __LOG = logging.getLogger('LedBoxAPI')
 
@@ -24,16 +25,8 @@ def run_pattern(body=None):
 	__LOG.info("Received 'run_pattern' request")
 	__LOG.debug(body)
 
-	"""run_pattern
-
-	Put new active pattern # noqa: E501
-
-	:param body: 
-	:type body: int
-
-	:rtype: None
-	"""
-	return 'do some magic!'
+	pattern_controller.start_pattern_display(body)
+	return None, 200
 
 
 def update_pattern(id_: int, body: dict):
