@@ -40,3 +40,33 @@ def start_pattern_display(led_pattern: LEDPattern):
 	__LOG.info(
 		"Starting new animation: {}...".format(led_pattern.animation_type))
 	__pattern_animator.start()
+
+
+json_str_none = """{
+	"name": "none_animation",
+	"colors": [
+		{
+			"r": 255,
+			"g": 0,
+			"b": 0
+		},
+		{
+			"r": 0,
+			"g": 255,
+			"b": 0
+		},
+		{
+			"r": 0,
+			"g": 0,
+			"b": 255
+		}
+	],
+	"repitionFactor": 0,
+	"colorGradientLengthFactor": 0.5,
+	"animationType": "none"
+}"""
+
+led_pattern_dict = json.loads(json_str_none)
+led_pattern = LEDPattern.from_dict(led_pattern_dict)
+
+start_pattern_display(led_pattern)

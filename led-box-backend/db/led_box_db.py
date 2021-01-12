@@ -10,6 +10,7 @@ insert_pattern_template = 'INSERT INTO LED_PATTERN (JSON) values (?)'
 update_pattern_template = 'UPDATE LED_PATTERN SET JSON = ? WHERE ID = ?'
 select_pattern_count_template = 'SELECT COUNT(*) FROM LED_PATTERN WHERE ID=?'
 select_all_patterns = 'SELECT * FROM LED_PATTERN'
+select_pattern_template = 'SELECT JSON FROM LED_PATTERN WHERE ID=?'
 
 select_last_insert_rowid = 'SELECT last_insert_rowid()'
 select_led_pattern_table = 'SELECT count(*) FROM sqlite_master WHERE name = \'LED_PATTERN\''
@@ -33,56 +34,69 @@ def __init_db():
 __init_db()
 
 def insert_pattern(pattern_dict: dict) -> int:
-    __db_lock.acquire()
-    cursor = __connection.cursor()
+	__db_lock.acquire()
+	cursor = __connection.cursor()
 
-    cursor.execute(insert_pattern_template, (json.dumps(pattern_dict),))
-    cursor.execute(select_last_insert_rowid)
-    id = cursor.fetchone()[0]
-    __connection.commit()
-    __db_lock.release()
+	cursor.execute(insert_pattern_template, (json.dumps(pattern_dict),))
+	cursor.execute(select_last_insert_rowid)
+	id = cursor.fetchone()[0]
+	__connection.commit()
+	__db_lock.release()
 
-    return id
+	return id
 
 
 def get_patterns() -> List[dict]:
-    __db_lock.acquire()
-    cursor = __connection.cursor()
+	__db_lock.acquire()
+	cursor = __connection.cursor()
 
-    cursor.execute(select_all_patterns)
-    result_list = cursor.fetchall()
-    __db_lock.release()
+	cursor.execute(select_all_patterns)
+	result_list = cursor.fetchall()
+	__db_lock.release()
 
-    pattern_list = []
+	pattern_list = []
 
-    for result in result_list:
-        id = result[0]
-        jsonString = result[1]
+	for result in result_list:
+		id = result[0]
+		jsonString = result[1]
 
-        jsonDict = json.loads(jsonString)
-        jsonDict['id'] = id
+		jsonDict = json.loads(jsonString)
+		jsonDict['id'] = id
 
-        pattern_list.append(jsonDict)
+		pattern_list.append(jsonDict)
 
-    return pattern_list
+	return pattern_list
 
 
 def is_pattern_existing(id: int) -> bool:
-    __db_lock.acquire()
-    cursor = __connection.cursor()
+	__db_lock.acquire()
+	cursor = __connection.cursor()
 
-    cursor.execute(select_pattern_count_template, (id,))
-    count = cursor.fetchone()[0]
-    __db_lock.release()
+	cursor.execute(select_pattern_count_template, (id,))
+	count = cursor.fetchone()[0]
+	__db_lock.release()
 
-    return count == 1
+	return count == 1
 
 
 def update_pattern(id: int, pattern_dict: dict):
-    pattern_dict['id'] = id
-    __db_lock.acquire()
-    cursor = __connection.cursor()
+	pattern_dict['id'] = id
+	__db_lock.acquire()
+	cursor = __connection.cursor()
 
-    cursor.execute(update_pattern_template, (json.dumps(pattern_dict), id))
-    __connection.commit()
-    __db_lock.release()
+	cursor.execute(update_pattern_template, (json.dumps(pattern_dict), id))
+	__connection.commit()
+	__db_lock.release()
+
+def get_pattern(id: int):
+	__db_lock.acquire()
+	cursor = __connection.cursor()
+
+	cursor.execute(select_pattern_template, (id,))
+	result = cursor.fetchone()
+	__db_lock.release()
+	
+	jsonString = result[0]
+	jsonDict = json.loads(jsonString)
+
+	return jsonDict
