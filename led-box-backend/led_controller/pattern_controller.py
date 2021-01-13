@@ -11,16 +11,16 @@ from led_controller.pattern_animator_chase import PatternAnimatorChase
 import logging
 
 # TODO: typing in all modules
-
 __LOG = logging.getLogger('PatternController')
 __pattern_animator = None
 
 __leds = adafruit_ws2801.WS2801(
             board.SCK, board.MOSI, PatternAnimator.LED_COUNT, auto_write=False)
+#failsafe
 __leds.deinit()
-__leds.leds = adafruit_ws2801.WS2801(
+__leds = adafruit_ws2801.WS2801(
             board.SCK, board.MOSI, PatternAnimator.LED_COUNT, auto_write=False)
-__leds.leds.brightness = 1
+__leds.brightness = 1
 
 def start_pattern_display(led_pattern: LEDPattern):
 	global __pattern_animator
@@ -40,33 +40,3 @@ def start_pattern_display(led_pattern: LEDPattern):
 	__LOG.info(
 		"Starting new animation: {}...".format(led_pattern.animation_type))
 	__pattern_animator.start()
-
-
-json_str_none = """{
-	"name": "none_animation",
-	"colors": [
-		{
-			"r": 255,
-			"g": 0,
-			"b": 0
-		},
-		{
-			"r": 0,
-			"g": 255,
-			"b": 0
-		},
-		{
-			"r": 0,
-			"g": 0,
-			"b": 255
-		}
-	],
-	"repitionFactor": 0,
-	"colorGradientLengthFactor": 0.5,
-	"animationType": "none"
-}"""
-
-led_pattern_dict = json.loads(json_str_none)
-led_pattern = LEDPattern.from_dict(led_pattern_dict)
-
-start_pattern_display(led_pattern)

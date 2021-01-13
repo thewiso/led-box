@@ -11,11 +11,12 @@
 # Install dependencies
 1. sudo apt-get update && sudo apt-get upgrade
 2. sudo apt-get install -y git python3 python3-pip
-3.  Install CircuitPython: https://learn.adafruit.com/circuitpython-on-raspberrypi-linux/installing-circuitpython-on-raspberry-pi
-4.  <code>sudo pip3 install -r requirements.txt</code>
+3.  <code>git clone https://github.com/thewiso/led-box.git</code>
+4.  <code>sudo pip3 install -r led-box/led-box-backend/requirements.txt</code>
 5.  5. **Optional** Swagger UI: <code>sudo pip3 install connexion[swagger-ui]</code>
 
 TODO: Start server at startup
 TODO: Capture portal
 TODO: Create sample database data
 TODO: reset leds at startup
+TODO: property for db path
