@@ -1,46 +1,37 @@
-export default class RGBColor {
-  protected _red = 0;
-  protected _green = 0;
-  protected _blue = 0;
+import { Color } from "@/api";
+import { getRandomInt } from "./RandomUtils";
+
+export default class RGBColor implements Color {
+  public r = 0;
+  public g = 0;
+  public b = 0;
 
   private static readonly RGB_REGEX = /rgb\((\d+),(\d+),(\d+)\)/g;
 
   constructor(red: number, green: number, blue: number) {
     if (RGBColor.isValidColor(red, green, blue)) {
-      this._red = red;
-      this._green = green;
-      this._blue = blue;
+      this.r = red;
+      this.g = green;
+      this.b = blue;
     }
   }
 
-  public get red() {
-    return this._red;
-  }
-
-  public get green() {
-    return this._green;
-  }
-
-  public get blue() {
-    return this._blue;
-  }
-
   public blend(otherColor: RGBColor, factor: number) {
-    const newRed = RGBColor.mergePrimaryColors(this._red, otherColor.red, factor);
-    const newGreen = RGBColor.mergePrimaryColors(this._green, otherColor.green, factor);
-    const newBlue = RGBColor.mergePrimaryColors(this._blue, otherColor.blue, factor);
+    const newRed = RGBColor.mergePrimaryColors(this.r, otherColor.r, factor);
+    const newGreen = RGBColor.mergePrimaryColors(this.g, otherColor.g, factor);
+    const newBlue = RGBColor.mergePrimaryColors(this.b, otherColor.b, factor);
     return new RGBColor(newRed, newGreen, newBlue);
   }
 
   public toString() {
-    return `rgb(${this._red},${this._green},${this._blue})`;
+    return `rgb(${this.r},${this.g},${this.b})`;
   }
 
   public toHex() {
     const hexParts = new Array(3);
-    hexParts[0] = this._red.toString(16);
-    hexParts[1] = this._green.toString(16);
-    hexParts[2] = this._blue.toString(16);
+    hexParts[0] = this.r.toString(16);
+    hexParts[1] = this.g.toString(16);
+    hexParts[2] = this.b.toString(16);
 
     for (let i = 0; i < hexParts.length; i++) {
       while (hexParts[i].length < 2) {
@@ -52,7 +43,7 @@ export default class RGBColor {
   }
 
   public toRGBAString(alpha: number) {
-    return `rgba(${this._red},${this._green},${this._blue},${alpha})`;
+    return `rgba(${this.r},${this.g},${this.b},${alpha})`;
   }
 
   public static isValidPrimaryColor(primaryColor: number): boolean {
@@ -95,6 +86,14 @@ export default class RGBColor {
       return new RGBColor(parseInt(matches[1]), parseInt(matches[2]), parseInt(matches[3]));
     }
     return null;
+  }
+
+  public static fromApiModelColor(color: Color) {
+    return new RGBColor(color.r, color.g, color.b);
+  }
+
+  public static createRandomColor(): RGBColor {
+    return new RGBColor(getRandomInt(0, 255), getRandomInt(0, 255), getRandomInt(0, 255));
   }
 
   public static Black = new RGBColor(0, 0, 0);

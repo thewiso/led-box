@@ -11,10 +11,10 @@ export default class RGBAColor extends RGBColor {
   }
 
   public static fromRGBColor(rgbColor: RGBColor, alpha: number) {
-    return new RGBAColor(rgbColor.red, rgbColor.green, rgbColor.blue, alpha);
+    return new RGBAColor(rgbColor.r, rgbColor.g, rgbColor.b, alpha);
   }
 
   public toString() {
-    return `rgba(${this.red},${this.green},${this.blue},${this.alpha})`;
+    return `rgba(${this.r},${this.g},${this.b},${this.alpha})`;
   }
 }

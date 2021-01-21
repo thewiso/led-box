@@ -1,0 +1,12 @@
+.openapi-generator-ignore
+apis/DefaultApi.ts
+apis/index.ts
+index.ts
+models/BlinkLEDPattern.ts
+models/BlinkLEDPatternAllOf.ts
+models/ChaseLEDPattern.ts
+models/ChaseLEDPatternAllOf.ts
+models/Color.ts
+models/LEDPattern.ts
+models/index.ts
+runtime.ts

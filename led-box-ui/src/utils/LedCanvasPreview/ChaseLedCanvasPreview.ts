@@ -1,7 +1,7 @@
-import LedCanvasPreview, { LED_RADIUS } from "./LedCanvasPreview";
-import RGBColor from "../RGBColor";
-import Led from "../Led";
-import RGBAColor from "../RGBAColor";
+import Led from "@/utils/Led";
+import RGBAColor from "@/utils/RGBAColor";
+import RGBColor from "@/utils/RGBColor";
+import LedCanvasPreview from "./LedCanvasPreview";
 
 type ChaseColorProvider = (led: Led, chaseIndex: number) => RGBColor;
 
@@ -30,17 +30,7 @@ export default class ChaseLedCanvasPreview extends LedCanvasPreview {
     chaseSpeed: number,
     chaseForegroundColor?: RGBColor,
   ) {
-    super(
-      backgroundContext,
-      canvasWidth,
-      canvasHeight,
-      backgroundColor,
-      patternColors,
-      ledCount,
-      repitionFactor,
-      colorGradientLengthFactor,
-      loopCount,
-    );
+    super(backgroundContext, canvasWidth, canvasHeight, backgroundColor, patternColors, ledCount, repitionFactor, colorGradientLengthFactor, loopCount);
 
     this.foregroundContext = foregroundContext;
     this.chaseForegroundColor = chaseForegroundColor;
@@ -91,9 +81,7 @@ export default class ChaseLedCanvasPreview extends LedCanvasPreview {
       previousTimeStamp = timeStamp;
       previousStartIndex = startIndex;
     }
-    this.animationRequestId = window.requestAnimationFrame(timeStamp =>
-      this.animateChase(timeStamp, previousStartIndex, previousTimeStamp),
-    );
+    this.animationRequestId = window.requestAnimationFrame(timeStamp => this.animateChase(timeStamp, previousStartIndex, previousTimeStamp));
   }
   private drawChase(startIndex: number) {
     let chaseIndex = 0;
@@ -125,17 +113,17 @@ export default class ChaseLedCanvasPreview extends LedCanvasPreview {
   private createChaseColorProvider(): ChaseColorProvider {
     let retVal: ChaseColorProvider;
     if (this.chaseForegroundColor === undefined) {
-      retVal = (led: Led, chaseIndex: number) => {
+      retVal = (led: Led) => {
         return led.color;
       };
     } else {
-      retVal = (led: Led, chaseIndex: number) => {
+      retVal = () => {
         return this.chaseForegroundColor as RGBColor;
       };
     }
 
     if (this.chaseGradientLength > 0 && this.chaseLength > 1) {
-	  const risingGradientExclusiveEndIndex = this.chaseGradientLength
+      const risingGradientExclusiveEndIndex = this.chaseGradientLength;
       const descendingGradientStartIndex = this.chaseLength - this.chaseGradientLength;
 
       return (led: Led, chaseIndex: number) => {

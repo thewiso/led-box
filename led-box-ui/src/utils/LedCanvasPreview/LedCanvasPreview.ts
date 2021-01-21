@@ -1,6 +1,5 @@
-import RGBColor from "../RGBColor";
-import Led, { Coordinate } from "../Led";
-import LedPattern from "../LedPattern";
+import RGBColor from "@/utils/RGBColor";
+import Led, { Coordinate } from "@/utils/Led";
 
 export const LED_RADIUS = 5;
 export const LED_DIAMETER = LED_RADIUS * 2;

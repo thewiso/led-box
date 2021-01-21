@@ -10,33 +10,33 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LEDPattern'
+              $ref: "#/components/schemas/LEDPattern"
         required: true
       responses:
-        '201':
+        "201":
           description: Created
           content:
             application/json:
               schema:
                 type: integer
                 description: Id of the created pattern
-        '400':
+        "400":
           description: Bad Request
     get:
       description: Get all patterns
       operationId: getPatterns
       responses:
-        '200':
+        "200":
           description: Ok
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/LEDPattern'
-        '400':
+                  $ref: "#/components/schemas/LEDPattern"
+        "400":
           description: Bad Request
-  '/led-patterns/{id}':
+  "/led-patterns/{id}":
     patch:
       operationId: updatePattern
       parameters:
@@ -49,16 +49,29 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LEDPattern'
+              $ref: "#/components/schemas/LEDPattern"
         required: true
       responses:
-        '200':
+        "200":
           description: Ok
-        '400':
+        "400":
           description: Bad Request
-        '404':
+        "404":
           description: Not Found
   /led-patterns/active:
+    get:
+      description: Get currently active pattern id
+      operationId: getActivePattern
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: Id of currently active pattern
+        "404":
+          description: Not Found
     put:
       description: Put new active pattern
       operationId: runPattern
@@ -66,19 +79,23 @@ paths:
         content:
           application/json:
             schema:
-              type: object
+              type: integer
               description: Id of the new active pattern
-              properties:
-                id:
-                  type: integer
-              required:
-                - id
+        required: true
       responses:
-        '200':
+        "204":
           description: Ok
-        '400':
+        "400":
           description: Bad Request
-        '404':
+        "404":
+          description: Not Found
+    delete:
+      description: Stop currently active pattern
+      operationId: stopPattern
+      responses:
+        "204":
+          description: Ok
+        "404":
           description: Not Found
 components:
   schemas:
@@ -89,73 +106,87 @@ components:
           type: integer
         name:
           type: string
+          minLength: 3
           maxLength: 20
         colors:
           description: Colors that will be displayed in-line
           type: array
           items:
-            $ref: '#/components/schemas/Color'
+            $ref: "#/components/schemas/Color"
           minItems: 1
           maxItems: 5
         repitionFactor:
-          description: 'Describes how often the colors will be repeated in the LED strip. 0 = No repetition, 1 = One LED per color'
+          description: "Describes how often the colors will be repeated in the LED strip. 0 = No repetition, 1 = One LED per color"
           type: number
           format: float
           minimum: 0
           maximum: 1
         colorGradientLengthFactor:
-          description: 'Describes how many of the LED of one color create a gradient to the next and previous color. 0 = No gradient, 0.5 Half of LED create a gradient to the next and previous color'
+          description: "Describes how many of the LED of one color create a gradient to the next and previous color. 0 = No gradient, 0.5 Half of LED create a gradient to the next and previous color"
           type: number
           format: float
           minimum: 0
           maximum: 0.5
-        animationType:
+        patternType:
           type: string
-          enum:
-            - none
-            - blink
-            - chase
-        blinkSpeed:
-          description: Describes how often the LED will blink in a second
-          type: number
-          format: float
-          minimum: 0.1
-          maximum: 3
-        blinkDimmingPeriodFactor:
-          description: 'Describes how much of the blinking time is used for blinking. 0 = No dimming, 1 = Full period between on and off will be dimmed'
-          type: number
-          format: float
-          minimum: 0
-          maximum: 1
-        chaseSpeed:
-          description: Describes how many LED per second the chase will move
-          type: number
-          format: float
-          minimum: 1
-          maximum: 300
-        chaseLengthFactor:
-          description: "Describes how many of the strip's LED will be used for the chase. 0 = 1 LED, 0.99 = 99% of LED"
-          type: number
-          format: float
-          minimum: 0
-          maximum: 0.99
-        chaseGradientLengthFactor:
-          description: "Describes how many of the LED of one the chase create a gradient to the next and previous color. 0 = No gradient, 0.5 Half of the chase's LED create a gradient to the next and previous color"
-          type: number
-          format: float
-          minimum: 0
-          maximum: 0.5
-        chaseForeground:
-          description: "When null, the pattern's color will be used for the chase and the background will be black. When not null, the chaseForeground will be used for the chase and the pattern's color will be used for the background"
-          nullable: true
-          allOf:
-            - $ref: '#/components/schemas/Color'
+      discriminator:
+        propertyName: patternType
       required:
         - name
         - colors
         - repitionFactor
         - colorGradientLengthFactor
-        - animationType
+        - patternType
+    BlinkLEDPattern:
+      allOf:
+        - $ref: "#/components/schemas/LEDPattern"
+        - type: object
+          properties:
+            blinkSpeed:
+              description: Describes how often the LED will blink in a second
+              type: number
+              format: float
+              minimum: 0.1
+              maximum: 3
+            blinkDimmingPeriodFactor:
+              description: "Describes how much of the blinking time is used for blinking. 0 = No dimming, 1 = Full period between on and off will be dimmed"
+              type: number
+              format: float
+              minimum: 0
+              maximum: 1
+          required:
+            - blinkSpeed
+            - blinkDimmingPeriodFactor
+    ChaseLEDPattern:
+      allOf:
+        - $ref: "#/components/schemas/LEDPattern"
+        - type: object
+          properties:
+            chaseSpeed:
+              description: Describes how many LED per second the chase will move
+              type: number
+              format: float
+              minimum: 1
+              maximum: 300
+            chaseLengthFactor:
+              description: "Describes how many of the strip's LED will be used for the chase. 0 = 1 LED, 0.99 = 99% of LED"
+              type: number
+              format: float
+              minimum: 0
+              maximum: 0.99
+            chaseGradientLengthFactor:
+              description: "Describes how many of the LED of one the chase create a gradient to the next and previous color. 0 = No gradient, 0.5 Half of the chase's LED create a gradient to the next and previous color"
+              type: number
+              format: float
+              minimum: 0
+              maximum: 0.5
+            chaseForeground:
+              description: "When null, the pattern's color will be used for the chase and the background will be black. When not null, the chaseForeground will be used for the chase and the pattern's color will be used for the background"
+              $ref: "#/components/schemas/Color"
+          required:
+            - chaseSpeed
+            - chaseLengthFactor
+            - chaseGradientLengthFactor
     Color:
       description: RGB Color
       type: object
@@ -175,3 +206,7 @@ components:
           type: integer
           minimum: 0
           maximum: 255
+      required:
+        - r
+        - g
+        - b

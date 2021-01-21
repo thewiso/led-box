@@ -1,5 +1,5 @@
 import LedCanvasPreview from "./LedCanvasPreview";
-import RGBColor from "../RGBColor";
+import RGBColor from "@/utils/RGBColor";
 
 export default class BlinkLedCanvasPreview extends LedCanvasPreview {
   private animationRequestId = null as number | null;

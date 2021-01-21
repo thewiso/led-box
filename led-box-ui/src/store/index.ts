@@ -1,11 +1,32 @@
+import LEDPatternImpl from "@/utils/LEDPatternImpl";
 import Vue from "vue";
 import Vuex from "vuex";
+import { Configuration, DefaultApi, LEDPattern } from "@/api/index";
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
-  state: {},
-  mutations: {},
+const store = new Vuex.Store({
+  state: {
+    ledPatterns: [] as Array<LEDPattern>,
+    activePatternId: null as null | number,
+  },
+  mutations: {
+    clearPatterns(state) {
+      state.ledPatterns = [];
+    },
+    addPatterns(state, ledPatterns: Array<LEDPattern>) {
+      state.ledPatterns = state.ledPatterns.concat(ledPatterns);
+    },
+    setActivePatternId(state, activePatternId) {
+      state.activePatternId = activePatternId;
+    },
+  },
   actions: {},
-  modules: {}
+  getters: {
+    getPatternById: state => (patternId: number) => {
+      return state.ledPatterns.find(pattern => pattern.id === patternId);
+    },
+  },
+  modules: {},
 });
+export default store;

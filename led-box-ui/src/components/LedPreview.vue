@@ -20,11 +20,13 @@
 
 <script lang="ts">
 import Vue from "vue";
-import LedPattern, { AnimationType } from "../utils/LedPattern";
-import RGBColor from "../utils/RGBColor";
-import LedCanvasPreview, { LOOP_HEIGHT, LOOP_WIDTH, LOOP_LED_COUNT } from "../utils/LedCanvasPreview/LedCanvasPreview";
-import BlinkLedCanvasPreview from "../utils/LedCanvasPreview/BlinkLedCanvasPreview";
-import ChaseLedCanvasPreview from "../utils/LedCanvasPreview/ChaseLedCanvasPreview";
+import LEDPatternImpl from "@/utils/LEDPatternImpl";
+import BlinkLEDPatternImpl from "@/utils/BlinkLEDPatternImpl";
+import ChaseLEDPatternImpl from "@/utils/ChaseLEDPatternImpl";
+import RGBColor from "@/utils/RGBColor";
+import LedCanvasPreview, { LOOP_HEIGHT, LOOP_WIDTH, LOOP_LED_COUNT } from "@/utils/ledCanvasPreview/LedCanvasPreview";
+import BlinkLedCanvasPreview from "@/utils/ledCanvasPreview/BlinkLedCanvasPreview";
+import ChaseLedCanvasPreview from "@/utils/ledCanvasPreview/ChaseLedCanvasPreview";
 
 export default Vue.extend({
   name: "LedPreview",
@@ -34,7 +36,7 @@ export default Vue.extend({
       required: true,
     },
     ledPattern: {
-      type: LedPattern,
+      type: LEDPatternImpl,
       required: true,
     },
   },
@@ -110,12 +112,7 @@ export default Vue.extend({
       }
     },
     onPatternChange() {
-      if (
-        this.foregroundCanvas === null ||
-        this.foregroundContext === null ||
-        this.backgroundCanvas === null ||
-        this.backgroundContext === null
-      ) {
+      if (this.foregroundCanvas === null || this.foregroundContext === null || this.backgroundCanvas === null || this.backgroundContext === null) {
         return;
       }
 
@@ -126,19 +123,7 @@ export default Vue.extend({
 
       this.ledCount = this.loopCount * LOOP_LED_COUNT;
 
-      if (this.ledPattern.animationType === AnimationType.None) {
-        this.ledCanvasPreview = new LedCanvasPreview(
-          this.backgroundContext,
-          this.backgroundCanvas.width,
-          this.backgroundCanvas.height,
-          this.backgroundColor,
-          this.ledPattern.colors,
-          this.ledCount,
-          this.ledPattern.repitionFactor,
-          this.ledPattern.colorGradientLengthFactor,
-          this.loopCount,
-        );
-      } else if (this.ledPattern.animationType === AnimationType.Blink) {
+      if (this.ledPattern instanceof BlinkLEDPatternImpl) {
         this.ledCanvasPreview = new BlinkLedCanvasPreview(
           this.foregroundContext,
           this.backgroundContext,
@@ -153,7 +138,7 @@ export default Vue.extend({
           this.ledPattern.blinkSpeed,
           this.ledPattern.blinkDimmingPeriodFactor,
         );
-      } else if (this.ledPattern.animationType === AnimationType.Chase) {
+      } else if (this.ledPattern instanceof ChaseLEDPatternImpl) {
         this.ledCanvasPreview = new ChaseLedCanvasPreview(
           this.foregroundContext,
           this.backgroundContext,
@@ -169,6 +154,18 @@ export default Vue.extend({
           this.ledPattern.chaseGradientLengthFactor,
           this.ledPattern.chaseSpeed,
           this.ledPattern.chaseForeground,
+        );
+      } else {
+        this.ledCanvasPreview = new LedCanvasPreview(
+          this.backgroundContext,
+          this.backgroundCanvas.width,
+          this.backgroundCanvas.height,
+          this.backgroundColor,
+          this.ledPattern.colors,
+          this.ledCount,
+          this.ledPattern.repitionFactor,
+          this.ledPattern.colorGradientLengthFactor,
+          this.loopCount,
         );
       }
 
