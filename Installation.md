@@ -10,10 +10,13 @@
 
 # Install dependencies
 1. sudo apt-get update && sudo apt-get upgrade
-2. sudo apt-get install -y git python3 python3-pip
+2. sudo apt-get install -y git python3 python3-pip virtualenv nginx
 3.  <code>git clone https://github.com/thewiso/led-box.git</code>
-4.  <code>sudo pip3 install -r led-box/led-box-backend/requirements.txt</code>
-5.  5. **Optional** Swagger UI: <code>sudo pip3 install connexion[swagger-ui]</code>
+4.  <code>python3 -m virtualenv led-box/led-box-backend/env</code>
+5.  <code>source led-box/led-box-backend/env/bin/activate</code>
+6.  <code>pip3 install -r led-box/led-box-backend/requirements.txt</code>
+7.  <code>sudo vi /etc/systemd/system/led-box-backend.service</code>
+8.  5. **Optional** Swagger UI: <code>sudo pip3 install connexion[swagger-ui]</code>
 
 TODO: Start server at startup
 TODO: Capture portal
