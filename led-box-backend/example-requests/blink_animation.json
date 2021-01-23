@@ -19,7 +19,7 @@
 	],
 	"repitionFactor": 0,
 	"colorGradientLengthFactor": 0.3,
-	"animationType": "blink",
+	"patternType": "BlinkLEDPattern",
 	"blinkSpeed": 0.1,
 	"blinkDimmingPeriodFactor": 0.5
 }

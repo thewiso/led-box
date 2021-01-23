@@ -19,7 +19,7 @@
 	],
 	"repitionFactor": 0,
 	"colorGradientLengthFactor": 0.3,
-	"animationType": "chase",
+	"patternType": "ChaseLEDPattern",
 	"chaseSpeed": 20,
 	"chaseLengthFactor": 0.2,
 	"chaseGradientLengthFactor": 0.25

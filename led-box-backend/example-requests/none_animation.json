@@ -19,5 +19,5 @@
 	],
 	"repitionFactor": 0,
 	"colorGradientLengthFactor": 0.3,
-	"animationType": "none"
+	"patternType": "LEDPattern"
 }

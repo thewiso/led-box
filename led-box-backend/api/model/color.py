@@ -5,7 +5,7 @@ from datetime import date, datetime  # noqa: F401
 
 from typing import List, Dict  # noqa: F401
 
-from .base_model_ import Model
+from api.model.base_model_ import Model
 from api.util import util
 
 
@@ -72,6 +72,8 @@ class Color(Model):
         :param r: The r of this Color.
         :type r: int
         """
+        if r is None:
+            raise ValueError("Invalid value for `r`, must not be `None`")  # noqa: E501
         if r is not None and r > 255:  # noqa: E501
             raise ValueError("Invalid value for `r`, must be a value less than or equal to `255`")  # noqa: E501
         if r is not None and r < 0:  # noqa: E501
@@ -99,6 +101,8 @@ class Color(Model):
         :param g: The g of this Color.
         :type g: int
         """
+        if g is None:
+            raise ValueError("Invalid value for `g`, must not be `None`")  # noqa: E501
         if g is not None and g > 255:  # noqa: E501
             raise ValueError("Invalid value for `g`, must be a value less than or equal to `255`")  # noqa: E501
         if g is not None and g < 0:  # noqa: E501
@@ -126,6 +130,8 @@ class Color(Model):
         :param b: The b of this Color.
         :type b: int
         """
+        if b is None:
+            raise ValueError("Invalid value for `b`, must not be `None`")  # noqa: E501
         if b is not None and b > 255:  # noqa: E501
             raise ValueError("Invalid value for `b`, must be a value less than or equal to `255`")  # noqa: E501
         if b is not None and b < 0:  # noqa: E501
