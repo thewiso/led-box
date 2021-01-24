@@ -20,7 +20,7 @@ sudo systemctl status led_box_backend #Should print "active"
 
 echo "Build vue application..."
 npm install --prefix led-box-ui
-npm run build --mode prod --prefix led-box-ui
+npm run build --prefix led-box-ui -- --mode prod 
 
 
 echo "Configure nginx..."
