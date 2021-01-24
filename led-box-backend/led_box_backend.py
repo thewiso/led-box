@@ -10,7 +10,8 @@ app.app.json_encoder = encoder.JSONEncoder
 app.add_api('../openapi.yaml',
             arguments={'title': 'LED Box API'},
             resolver=CamelCaseResolver('api.led_box_api'),
-            pythonic_params=True)
+            pythonic_params=True,
+            base_path="/api")
 
 application = app.app
 
