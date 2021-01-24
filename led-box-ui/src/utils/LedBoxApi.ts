@@ -4,9 +4,12 @@ import BlinkLEDPatternImpl from "@/utils/BlinkLEDPatternImpl";
 import ChaseLEDPatternImpl from "@/utils/ChaseLEDPatternImpl";
 import LEDPatternImpl from "@/utils/LEDPatternImpl";
 
+const BASE_PATH = process.env.VUE_APP_API_BASE_PATH_USE_WINDOW_LOCATION == "true" ? `http://${window.location.host}/api` : process.env.VUE_APP_API_BASE_PATH;
+console.log(`API base path is "${BASE_PATH}"`);
+
 const LedBoxApi = new (class extends DefaultApi {
   constructor() {
-    super(new Configuration({ basePath: process.env.VUE_APP_API_BASE_PATH }));
+    super(new Configuration({ basePath: BASE_PATH }));
   }
 
   async getPatterns(): Promise<Array<LEDPattern>> {
