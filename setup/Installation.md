@@ -8,13 +8,20 @@
 5. **Optional** Change hostname: <code>sudo raspi-config</code>
 6. Enable SPI with <code>sudo raspi-config</code> in menu item "Interface Options"
 
-# Install dependencies
+# Set the server up
 1.  <code>git clone https://github.com/thewiso/led-box.git</code>
-2.  Execute <code>cd led-box && sudo sh led-box/install.sh</code>
-3.  5. **Optional** Swagger UI: <code>sudo pip3 install connexion[swagger-ui]</code>
+2.  Building the Vue application: NPM builds on the Raspberry Pi Zero take eternities, so:
+    1. Install Node and NPM on your PC
+    2. Clone the git repository 
+    3. <code>cd led-box/led-box-ui</code>
+    4. <code>npm install</code>
+    5. <code>npm run build -- --mode prod</code>
+    6.  Copy the folder "led-box/led-box-ui/dist" into the same path in your local Git repository on your Raspberry Pi e.g. with SFTP 
+3.  <code>cd led-box</code>
+4.  <code>sudo sh setup/installRuntimeDependencies.sh</code>
+5.  **Optional** Install Swagger UI: <code>sudo pip3 install connexion[swagger-ui]</code>
+6.  <code>sudo sh setup/configureServers.sh</code>
 
-TODO: Start server at startup
 TODO: Capture portal
 TODO: Create sample database data
 TODO: reset leds at startup
-TODO: property for db path
