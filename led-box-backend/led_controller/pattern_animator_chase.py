@@ -10,119 +10,119 @@ from typing import Tuple, Callable
 
 class PatternAnimatorChase(PatternAnimator):
 
-	LOG = logging.getLogger('PatternAnimatorChase')
+    LOG = logging.getLogger(__name__)
 
-	def __init__(self, leds: adafruit_ws2801.WS2801, led_pattern: LEDPattern):
-		super().__init__(leds, led_pattern)
+    def __init__(self, leds: adafruit_ws2801.WS2801, led_pattern: LEDPattern):
+        super().__init__(leds, led_pattern)
 
-		self.chase_length = max(1, round(
-			led_pattern.chase_length_factor * PatternAnimator.LED_COUNT))
-		self.chase_gradient_length = math.floor(
-			self.chase_length * led_pattern.chase_gradient_length_factor)
-		self.chase_step_duration = round(1000 / led_pattern.chase_speed)
+        self.chase_length = max(1, round(
+            led_pattern.chase_length_factor * PatternAnimator.LED_COUNT))
+        self.chase_gradient_length = math.floor(
+            self.chase_length * led_pattern.chase_gradient_length_factor)
+        self.chase_step_duration = round(1000 / led_pattern.chase_speed)
 
-		self.timer = None
-		self.timer_lock = threading.Lock()
+        self.timer = None
+        self.timer_lock = threading.Lock()
 
-		if(led_pattern.chase_foreground is None):
-			self.background_color_list = [
-				(0, 0, 0)] * PatternAnimator.LED_COUNT
-			self.chase_color_list = self.led_color_list
-		else:
-			self.background_color_list = self.led_color_list
-			chase_color = self.get_color_tuple_from_color_object(
-				led_pattern.chase_foreground)
-			self.chase_color_list = [chase_color] * PatternAnimator.LED_COUNT
+        if(led_pattern.chase_foreground is None):
+            self.background_color_list = [
+                (0, 0, 0)] * PatternAnimator.LED_COUNT
+            self.chase_color_list = self.led_color_list
+        else:
+            self.background_color_list = self.led_color_list
+            chase_color = self.get_color_tuple_from_color_object(
+                led_pattern.chase_foreground)
+            self.chase_color_list = [chase_color] * PatternAnimator.LED_COUNT
 
-		self.get_chase_color = self.create_chase_color_provider()
+        self.get_chase_color = self.create_chase_color_provider()
 
-	def start(self):
-		PatternAnimatorChase.LOG.debug("Starting pattern animation...")
-		self.clear_leds()
+    def start(self):
+        PatternAnimatorChase.LOG.debug("Starting pattern animation...")
+        self.clear_leds()
 
-		self.fill_and_show_leds(self.background_color_list)
+        self.fill_and_show_leds(self.background_color_list)
 
-		with self.timer_lock:
-			self.timer = threading.Timer(0.1, self.chase, args=(0, int(round(time.time() * 1000))))
-			self.timer.start()
-		
-		PatternAnimatorChase.LOG.debug("Started pattern animation")
+        with self.timer_lock:
+            self.timer = threading.Timer(
+                0.1, self.chase, args=(0, int(round(time.time() * 1000))))
+            self.timer.start()
 
-	def stop(self):
-		PatternAnimatorChase.LOG.debug("Stopping pattern animation...")
-		if(self.timer is not None):
-			with self.timer_lock:
-				self.timer.cancel()
+        PatternAnimatorChase.LOG.debug("Started pattern animation")
 
-			self.clear_leds()
-		PatternAnimatorChase.LOG.debug("Stopped pattern animation")
+    def stop(self):
+        PatternAnimatorChase.LOG.debug("Stopping pattern animation...")
+        if(self.timer is not None):
+            with self.timer_lock:
+                self.timer.cancel()
 
-	def chase(self, previous_chase_start_index: int, previous_time_stamp: int):
-		timestamp = int(round(time.time() * 1000))
+            self.clear_leds()
+        PatternAnimatorChase.LOG.debug("Stopped pattern animation")
 
-		elapsed = timestamp - previous_time_stamp
-		elapsed_steps = round(elapsed / self.chase_step_duration)
-		if elapsed_steps > 0:
-			chase_start_index = (previous_chase_start_index +
-								 elapsed_steps) % PatternAnimator.LED_COUNT
+    def chase(self, previous_chase_start_index: int, previous_time_stamp: int):
+        timestamp = int(round(time.time() * 1000))
 
-			self.fill_leds(self.background_color_list,
-						   previous_chase_start_index, elapsed_steps)
-			self.fill_chase(chase_start_index)
-			
+        elapsed = timestamp - previous_time_stamp
+        elapsed_steps = round(elapsed / self.chase_step_duration)
+        if elapsed_steps > 0:
+            chase_start_index = (previous_chase_start_index +
+                                 elapsed_steps) % PatternAnimator.LED_COUNT
 
-			previous_time_stamp = timestamp
-			previous_chase_start_index = chase_start_index
+            self.fill_leds(self.background_color_list,
+                           previous_chase_start_index, elapsed_steps)
+            self.fill_chase(chase_start_index)
 
-			self.leds.show()
-			
-		with self.timer_lock:
-			self.timer = threading.Timer(0.01, self.chase, args=(
-				previous_chase_start_index, previous_time_stamp))
-			self.timer.start()
+            previous_time_stamp = timestamp
+            previous_chase_start_index = chase_start_index
 
-	# callable signature: chase_index, led_index, returns color tuple
-	def create_chase_color_provider(self) -> Callable[[int, int], Tuple[int, int, int]]:
-		if self.chase_gradient_length > 0 and self.chase_length > 1:
-			rising_gradient_exclusive_end_index = self.chase_gradient_length
-			descending_gradient_start_index = self.chase_length - self.chase_gradient_length
+            self.leds.show()
 
-			def get_chase_color(chase_index: int, led_index: int) -> Tuple[int, int, int]:
-				merge_factor = None
-				if chase_index < rising_gradient_exclusive_end_index:
-					merge_factor = (chase_index + 1) / \
-						(self.chase_gradient_length + 1)
-				elif chase_index >= descending_gradient_start_index:
-					merge_factor = (descending_gradient_start_index + self.chase_gradient_length -
-									chase_index) / (self.chase_gradient_length + 1)
+        with self.timer_lock:
+            self.timer = threading.Timer(0.01, self.chase, args=(
+                previous_chase_start_index, previous_time_stamp))
+            self.timer.start()
 
-				if merge_factor is None:
-					return self.chase_color_list[led_index]
-				else:
-					return self.merge_color_tuples(self.background_color_list[led_index], self.chase_color_list[led_index], merge_factor)
+    # callable signature: chase_index, led_index, returns color tuple
+    def create_chase_color_provider(self) -> Callable[[int, int], Tuple[int, int, int]]:
+        if self.chase_gradient_length > 0 and self.chase_length > 1:
+            rising_gradient_exclusive_end_index = self.chase_gradient_length
+            descending_gradient_start_index = self.chase_length - self.chase_gradient_length
 
-		else:
-			def get_chase_color(chase_index: int, led_index: int) -> Tuple[int, int, int]:
-				return self.chase_color_list[led_index]
+            def get_chase_color(chase_index: int, led_index: int) -> Tuple[int, int, int]:
+                merge_factor = None
+                if chase_index < rising_gradient_exclusive_end_index:
+                    merge_factor = (chase_index + 1) / \
+                        (self.chase_gradient_length + 1)
+                elif chase_index >= descending_gradient_start_index:
+                    merge_factor = (descending_gradient_start_index + self.chase_gradient_length -
+                                    chase_index) / (self.chase_gradient_length + 1)
 
-		return get_chase_color
+                if merge_factor is None:
+                    return self.chase_color_list[led_index]
+                else:
+                    return self.merge_color_tuples(self.background_color_list[led_index], self.chase_color_list[led_index], merge_factor)
 
-	def fill_chase(self, start_index: int):
-		exclusive_end_index = (
-			start_index + self.chase_length) % PatternAnimator.LED_COUNT
+        else:
+            def get_chase_color(chase_index: int, led_index: int) -> Tuple[int, int, int]:
+                return self.chase_color_list[led_index]
 
-		chase_index = 0
+        return get_chase_color
 
-		if(start_index < exclusive_end_index):
-			for i in range(start_index, exclusive_end_index):
-				self.leds[i] = self.get_chase_color(chase_index, i)
-				chase_index = chase_index + 1
+    def fill_chase(self, start_index: int):
+        exclusive_end_index = (
+            start_index + self.chase_length) % PatternAnimator.LED_COUNT
 
-		else:
-			for i in range(start_index, PatternAnimator.LED_COUNT):
-				self.leds[i] = self.get_chase_color(chase_index, i)
-				chase_index = chase_index + 1
+        chase_index = 0
 
-			for i in range(0, exclusive_end_index):
-				self.leds[i] = self.get_chase_color(chase_index, i)
-				chase_index = chase_index + 1
+        if(start_index < exclusive_end_index):
+            for i in range(start_index, exclusive_end_index):
+                self.leds[i] = self.get_chase_color(chase_index, i)
+                chase_index = chase_index + 1
+
+        else:
+            for i in range(start_index, PatternAnimator.LED_COUNT):
+                self.leds[i] = self.get_chase_color(chase_index, i)
+                chase_index = chase_index + 1
+
+            for i in range(0, exclusive_end_index):
+                self.leds[i] = self.get_chase_color(chase_index, i)
+                chase_index = chase_index + 1

@@ -11,7 +11,7 @@ from led_controller.pattern_animator_chase import PatternAnimatorChase
 import logging
 
 # TODO: typing in all modules
-__LOG = logging.getLogger('PatternController')
+__LOG = logging.getLogger(__name__)
 __pattern_animator = None
 
 __leds = adafruit_ws2801.WS2801(
@@ -29,12 +29,12 @@ def start_pattern_display(led_pattern: LEDPattern):
     if __pattern_animator is not None:
         __pattern_animator.stop()
 
-    if(led_pattern.animation_type == "none"):
+    if(led_pattern.pattern_type == "LEDPattern"):
         __pattern_animator = PatternAnimatorNone(__leds, led_pattern)
-    elif(led_pattern.animation_type == "blink"):
+    elif(led_pattern.pattern_type == "BlinkLEDPattern"):
         __pattern_animator = PatternAnimatorBlink(
             __leds, led_pattern)
-    elif(led_pattern.animation_type == "chase"):
+    elif(led_pattern.pattern_type == "ChaseLEDPattern"):
         __pattern_animator = PatternAnimatorChase(
             __leds, led_pattern)
 

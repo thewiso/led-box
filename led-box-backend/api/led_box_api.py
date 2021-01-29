@@ -6,7 +6,7 @@ from typing import Tuple, Any, List
 import logging
 import led_controller.pattern_controller as pattern_controller
 
-__LOG = logging.getLogger('LedBoxAPI')
+__LOG = logging.getLogger(__name__)
 
 
 def create_pattern(body: dict):
@@ -47,7 +47,7 @@ def run_pattern(body=None):
     __LOG.info("Received 'run_pattern' request")
     __LOG.debug(body)
 
-    id = body["id"]
+    id = body
     if led_box_db.is_pattern_existing(id):
         pattern_dict = led_box_db.get_pattern(id)
         led_pattern = LEDPattern.from_dict(pattern_dict)
