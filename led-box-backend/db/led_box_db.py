@@ -10,8 +10,8 @@ import os
 insert_pattern_template = 'INSERT INTO LED_PATTERN (JSON) values (?)'
 update_pattern_template = 'UPDATE LED_PATTERN SET JSON = ? WHERE ID = ?'
 select_pattern_count_template = 'SELECT COUNT(*) FROM LED_PATTERN WHERE ID=?'
-select_all_patterns = 'SELECT * FROM LED_PATTERN'
-select_pattern_template = 'SELECT JSON FROM LED_PATTERN WHERE ID=?'
+select_all_patterns = 'SELECT ID, JSON FROM LED_PATTERN'
+select_pattern_template = 'SELECT  ID, JSON FROM LED_PATTERN WHERE ID=?'
 
 select_last_insert_rowid = 'SELECT last_insert_rowid()'
 select_led_pattern_table = 'SELECT count(*) FROM sqlite_master WHERE name = \'LED_PATTERN\''
@@ -22,7 +22,7 @@ __ddl_file_path = os.path.join(os.path.dirname(__file__), 'ddl.sql')
 
 __connection = sqlite3.connect(__db_file_path, check_same_thread=False)
 __db_lock = threading.Lock()
-__LOG = logging.getLogger(__name__)
+__LOG = logging.getLogger('LedBoxDB')
 
 
 def __init_db():
@@ -103,7 +103,10 @@ def get_pattern(id: int):
     result = cursor.fetchone()
     __db_lock.release()
 
-    jsonString = result[0]
+    id = result[0]
+    jsonString = result[1]
+
     jsonDict = json.loads(jsonString)
+    jsonDict['id'] = id
 
     return jsonDict
