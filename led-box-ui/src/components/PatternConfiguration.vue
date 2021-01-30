@@ -35,7 +35,11 @@
         <v-col cols="12">
           <v-card color="secondary">
             <v-container>
-              <LedPreview id="pattenConfigurationLedPreview" :ledPattern="ledPattern"></LedPreview>
+              <LedPreview
+                id="pattenConfigurationLedPreview"
+                :ledPattern="ledPattern"
+                :ledPatternChangeTimestamp="ledPatternChangeTimestamp"
+              ></LedPreview>
             </v-container>
           </v-card>
         </v-col>
@@ -47,7 +51,11 @@
                 <v-col cols="12" v-for="(color, index) in ledPattern.colors" :key="index">
                   <v-card :color="color.toString()" shaped>
                     <v-card-actions>
-                      <div class="text-h6 led-color-number" v-text="index + 1 + '.'" :style="{ color: getContrastFontColor(color).toString() }"></div>
+                      <div
+                        class="text-h6 led-color-number"
+                        v-text="index + 1 + '.'"
+                        :style="{ color: getContrastFontColor(color).toString() }"
+                      ></div>
                       <v-spacer></v-spacer>
                       <v-btn icon @click="openPickColorDialog(createColorIdentifier(index))">
                         <v-icon :color="getContrastFontColor(color).toString()">mdi-pencil-outline</v-icon>
@@ -62,7 +70,14 @@
               <v-row class="color-add-button-container">
                 <v-spacer></v-spacer>
                 <v-col cols="auto">
-                  <v-btn fab color="accent" small class="add-color-fab" @click="openPickColorDialog(addColorIdentifier)" v-if="ledPattern.canAddColor()">
+                  <v-btn
+                    fab
+                    color="accent"
+                    small
+                    class="add-color-fab"
+                    @click="openPickColorDialog(addColorIdentifier)"
+                    v-if="ledPattern.canAddColor()"
+                  >
                     <v-icon>mdi-plus</v-icon>
                   </v-btn>
                 </v-col>
@@ -77,7 +92,13 @@
               <v-row>
                 <v-col cols="12">
                   <v-subheader>Repition rate</v-subheader>
-                  <v-slider v-model="ledPattern.repitionFactor" :min="minRepititonFactor" :max="maxRepitionFactor" :step="0" :disabled="ledPattern.colors.length <= 1"></v-slider>
+                  <v-slider
+                    v-model="ledPattern.repitionFactor"
+                    :min="minRepititonFactor"
+                    :max="maxRepitionFactor"
+                    :step="0"
+                    :disabled="ledPattern.colors.length <= 1"
+                  ></v-slider>
                 </v-col>
                 <v-col cols="12">
                   <v-subheader>Color gradient</v-subheader>
@@ -108,24 +129,49 @@
                 <!-- BLINKING: -->
                 <v-col cols="12" v-if="selectedAnimationType == animationTypeEnum.Blink">
                   <v-subheader>Blink speed</v-subheader>
-                  <v-slider v-model="ledPattern.blinkSpeed" :min="minBlinkSpeed" :max="maxBlinkSpeed" :step="0"></v-slider>
+                  <v-slider
+                    v-model="ledPattern.blinkSpeed"
+                    :min="minBlinkSpeed"
+                    :max="maxBlinkSpeed"
+                    :step="0"
+                  ></v-slider>
                 </v-col>
                 <v-col cols="12" v-if="selectedAnimationType == animationTypeEnum.Blink">
                   <v-subheader>Blink dimming</v-subheader>
-                  <v-slider v-model="ledPattern.blinkDimmingPeriodFactor" :min="minBlinkDimmingPeriodFactor" :max="maxBlinkDimmingPeriodFactor" :step="0"></v-slider>
+                  <v-slider
+                    v-model="ledPattern.blinkDimmingPeriodFactor"
+                    :min="minBlinkDimmingPeriodFactor"
+                    :max="maxBlinkDimmingPeriodFactor"
+                    :step="0"
+                  ></v-slider>
                 </v-col>
                 <!-- LIGHT CHASE: -->
                 <v-col cols="12" v-if="selectedAnimationType == animationTypeEnum.Chase">
                   <v-subheader>Chase speed</v-subheader>
-                  <v-slider v-model="ledPattern.chaseSpeed" :min="minChaseSpeed" :max="maxChaseSpeed" :step="0"></v-slider>
+                  <v-slider
+                    v-model="ledPattern.chaseSpeed"
+                    :min="minChaseSpeed"
+                    :max="maxChaseSpeed"
+                    :step="0"
+                  ></v-slider>
                 </v-col>
                 <v-col cols="12" v-if="selectedAnimationType == animationTypeEnum.Chase">
                   <v-subheader>Chase length</v-subheader>
-                  <v-slider v-model="ledPattern.chaseLengthFactor" :min="minChaseLengthFactor" :max="maxChaseLengthFactor" :step="0"></v-slider>
+                  <v-slider
+                    v-model="ledPattern.chaseLengthFactor"
+                    :min="minChaseLengthFactor"
+                    :max="maxChaseLengthFactor"
+                    :step="0"
+                  ></v-slider>
                 </v-col>
                 <v-col cols="12" v-if="selectedAnimationType == animationTypeEnum.Chase">
                   <v-subheader>Chase gradient</v-subheader>
-                  <v-slider v-model="ledPattern.chaseGradientLengthFactor" :min="minChaseGradientLengthFactor" :max="maxChaseGradientLengthFactor" :step="0"></v-slider>
+                  <v-slider
+                    v-model="ledPattern.chaseGradientLengthFactor"
+                    :min="minChaseGradientLengthFactor"
+                    :max="maxChaseGradientLengthFactor"
+                    :step="0"
+                  ></v-slider>
                 </v-col>
                 <v-col cols="12" v-if="selectedAnimationType == animationTypeEnum.Chase">
                   <v-subheader>Chase color</v-subheader>
@@ -236,10 +282,10 @@ export default Vue.extend({
   },
   data: () => ({
     ledPattern: LEDPatternImpl.createRandomPattern(),
+    ledPatternChangeTimestamp: Date.now(),
     pickColorDialogOpen: false,
     pickColorDialogColor: "",
     pickColorDialogColorIdentifier: ColorIdentifier.ADD_COLOR,
-    selectedAnimationType: AnimiationType.None,
 
     //const values:
     animationTypeEnum: AnimiationType,
@@ -279,6 +325,30 @@ export default Vue.extend({
         }
       },
     },
+    selectedAnimationType: {
+      get: function() {
+        if (this.ledPattern instanceof BlinkLEDPatternImpl) {
+          return AnimiationType.Blink;
+        } else if (this.ledPattern instanceof ChaseLEDPatternImpl) {
+          return AnimiationType.Chase;
+        } else {
+          return AnimiationType.None;
+        }
+      },
+      set: function(newValue: AnimiationType) {
+        switch (newValue) {
+          case AnimiationType.None:
+            this.ledPattern = new LEDPatternImpl(this.ledPattern);
+            break;
+          case AnimiationType.Blink:
+            this.ledPattern = BlinkLEDPatternImpl.createRandomPattern(this.ledPattern);
+            break;
+          case AnimiationType.Chase:
+            this.ledPattern = ChaseLEDPatternImpl.createRandomPattern(this.ledPattern);
+            break;
+        }
+      },
+    },
   },
   methods: {
     getTitle() {
@@ -292,7 +362,10 @@ export default Vue.extend({
       let color: string;
       if (colorIdentifier === ColorIdentifier.ADD_COLOR) {
         color = RGBColor.createRandomColor().toHex();
-      } else if (colorIdentifier === ColorIdentifier.EDIT_CHASE_FOREGROUND_COLOR && this.ledPattern instanceof ChaseLEDPatternImpl) {
+      } else if (
+        colorIdentifier === ColorIdentifier.EDIT_CHASE_FOREGROUND_COLOR &&
+        this.ledPattern instanceof ChaseLEDPatternImpl
+      ) {
         if (this.ledPattern.chaseForeground === undefined) {
           color = RGBColor.White.toHex();
         } else {
@@ -310,10 +383,14 @@ export default Vue.extend({
         const color = this.pickColorDialogColor;
         if (this.pickColorDialogColorIdentifier === ColorIdentifier.ADD_COLOR) {
           this.ledPattern.addHexColor(color);
-        } else if (this.pickColorDialogColorIdentifier === ColorIdentifier.EDIT_CHASE_FOREGROUND_COLOR && this.ledPattern instanceof ChaseLEDPatternImpl) {
+        } else if (
+          this.pickColorDialogColorIdentifier === ColorIdentifier.EDIT_CHASE_FOREGROUND_COLOR &&
+          this.ledPattern instanceof ChaseLEDPatternImpl
+        ) {
           this.ledPattern.chaseForeground = RGBColor.fromHex(color);
         } else {
           this.ledPattern.setHexColor(this.pickColorDialogColorIdentifier.index, color);
+          this.ledPatternChangeTimestamp = Date.now();
         }
       }
       this.pickColorDialogOpen = false;
@@ -334,10 +411,11 @@ export default Vue.extend({
     },
     savePattern(): Promise<number> {
       if (this.ledPattern.id !== undefined) {
-        return LedBoxApi.updatePattern({ id: this.ledPattern.id!, lEDPattern: this.ledPattern })
+        const savedPatternId = this.ledPattern.id;
+        return LedBoxApi.updatePattern({ id: this.ledPattern.id, lEDPattern: this.ledPattern })
           .then(() => {
             this.close();
-            return this.ledPattern.id!;
+            return savedPatternId;
           })
           .catch
           //TODO:
@@ -376,18 +454,6 @@ export default Vue.extend({
             console.error(`No pattern was found for given id ${this.patternId}`);
             this.closePickColorDialog();
           }
-        }
-      },
-    },
-    ledPattern: {
-      immediate: true,
-      handler(newVal: LEDPatternImpl) {
-        if (newVal instanceof BlinkLEDPatternImpl) {
-          this.selectedAnimationType = AnimiationType.Blink;
-        } else if (newVal instanceof ChaseLEDPatternImpl) {
-          this.selectedAnimationType = AnimiationType.Chase;
-        } else {
-          this.selectedAnimationType = AnimiationType.None;
         }
       },
     },

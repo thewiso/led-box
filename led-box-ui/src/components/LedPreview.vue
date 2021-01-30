@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 import LEDPatternImpl from "@/utils/LEDPatternImpl";
 import BlinkLEDPatternImpl from "@/utils/BlinkLEDPatternImpl";
 import ChaseLEDPatternImpl from "@/utils/ChaseLEDPatternImpl";
@@ -39,9 +39,13 @@ export default Vue.extend({
       type: LEDPatternImpl,
       required: true,
     },
+    //This is a workaround to be able to detect a change of the colors included in "ledPattern". Just watching "ledPattern" with the deep flag won't work
+    ledPatternChangeTimestamp: {
+      type: Number,
+      required: true,
+    },
   },
   components: {},
-
   data: () => ({
     //const variables:
     loopHeight: Math.ceil(LOOP_HEIGHT),
@@ -112,7 +116,12 @@ export default Vue.extend({
       }
     },
     onPatternChange() {
-      if (this.foregroundCanvas === null || this.foregroundContext === null || this.backgroundCanvas === null || this.backgroundContext === null) {
+      if (
+        this.foregroundCanvas === null ||
+        this.foregroundContext === null ||
+        this.backgroundCanvas === null ||
+        this.backgroundContext === null
+      ) {
         return;
       }
 
@@ -185,8 +194,13 @@ export default Vue.extend({
   },
   watch: {
     ledPattern: {
-      handler(newVal, oldVal) {
-        //TODO: change of array
+      handler() {
+        this.onPatternChange();
+      },
+      deep: true,
+    },
+    ledPatternChangeTimestamp: {
+      handler() {
         this.onPatternChange();
       },
       deep: true,

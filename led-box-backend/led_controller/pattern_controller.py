@@ -39,7 +39,7 @@ def start_pattern_display(led_pattern: LEDPattern):
             __leds, led_pattern)
 
     __LOG.info(
-        "Starting new animation: {}...".format(led_pattern.animation_type))
+        "Starting new animation: {}...".format(led_pattern.pattern_type))
     __pattern_animator.start()
 
 
