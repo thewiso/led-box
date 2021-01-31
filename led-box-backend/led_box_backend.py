@@ -2,10 +2,14 @@
 
 import connexion
 from connexion.resolver import RestyResolver
-from api.util import encoder
+from api.util import encoder, validator
 from api.util.camel_case_resolver import CamelCaseResolver
 import logging
 import sys
+
+validator_map = {
+    'body': validator.DiscriminatorRequestBodyValidator
+}
 
 app = connexion.App(__name__)
 app.app.json_encoder = encoder.JSONEncoder
@@ -13,7 +17,8 @@ app.add_api('../openapi.yaml',
             arguments={'title': 'LED Box API'},
             resolver=CamelCaseResolver('api.led_box_api'),
             pythonic_params=True,
-            base_path="/api")
+            base_path="/api",
+            validator_map=validator_map)
 
 application = app.app
 

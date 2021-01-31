@@ -1,5 +1,7 @@
 import connexion
 from .model.led_pattern import LEDPattern
+from .model.blink_led_pattern import BlinkLEDPattern
+from .model.chase_led_pattern import ChaseLEDPattern
 from db import led_box_db
 import json
 from typing import Tuple, Any, List
@@ -50,7 +52,14 @@ def run_pattern(body=None):
     id = body
     if led_box_db.is_pattern_existing(id):
         pattern_dict = led_box_db.get_pattern(id)
-        led_pattern = LEDPattern.from_dict(pattern_dict)
+
+        if pattern_dict["patternType"] == "BlinkLEDPattern":
+            led_pattern = BlinkLEDPattern.from_dict(pattern_dict)
+        elif pattern_dict["patternType"] == "ChaseLEDPattern":
+            led_pattern = ChaseLEDPattern.from_dict(pattern_dict)
+        else:
+            led_pattern = LEDPattern.from_dict(pattern_dict)
+
         pattern_controller.start_pattern_display(led_pattern)
 
         return None, 204

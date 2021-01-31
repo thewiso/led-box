@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 import LEDPatternImpl from "@/utils/LEDPatternImpl";
 import BlinkLEDPatternImpl from "@/utils/BlinkLEDPatternImpl";
 import ChaseLEDPatternImpl from "@/utils/ChaseLEDPatternImpl";
