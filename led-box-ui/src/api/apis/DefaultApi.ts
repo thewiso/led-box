@@ -24,6 +24,10 @@ export interface CreatePatternRequest {
     lEDPattern: LEDPattern;
 }
 
+export interface DeleteAllPatternsRequest {
+    body?: boolean;
+}
+
 export interface RunPatternRequest {
     body: number;
 }
@@ -67,6 +71,34 @@ export class DefaultApi extends runtime.BaseAPI {
     async createPattern(requestParameters: CreatePatternRequest): Promise<number> {
         const response = await this.createPatternRaw(requestParameters);
         return await response.value();
+    }
+
+    /**
+     * Delete all patterns
+     */
+    async deleteAllPatternsRaw(requestParameters: DeleteAllPatternsRequest): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/led-patterns`,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+            body: requestParameters.body as any,
+        });
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Delete all patterns
+     */
+    async deleteAllPatterns(requestParameters: DeleteAllPatternsRequest): Promise<void> {
+        await this.deleteAllPatternsRaw(requestParameters);
     }
 
     /**
@@ -151,6 +183,31 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async runPattern(requestParameters: RunPatternRequest): Promise<void> {
         await this.runPatternRaw(requestParameters);
+    }
+
+    /**
+     * Shutdown server and hosting system
+     */
+    async shutdownServerRaw(): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/server/shutdown`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Shutdown server and hosting system
+     */
+    async shutdownServer(): Promise<void> {
+        await this.shutdownServerRaw();
     }
 
     /**

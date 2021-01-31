@@ -1,7 +1,6 @@
-import LEDPatternImpl from "@/utils/LEDPatternImpl";
 import Vue from "vue";
 import Vuex from "vuex";
-import { Configuration, DefaultApi, LEDPattern } from "@/api/index";
+import { LEDPattern } from "@/api/index";
 
 Vue.use(Vuex);
 

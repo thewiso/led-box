@@ -30,6 +30,7 @@ const MINIMUM_PROPERTY = "minimum";
 const MAXIMUM_PROPERTY = "maximum";
 
 function GetConstraintFromLedPatternProperties<T>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   schemas: any,
   modelName: string,
   propertyName: string,

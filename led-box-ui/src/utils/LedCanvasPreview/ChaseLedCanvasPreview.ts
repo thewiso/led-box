@@ -30,7 +30,17 @@ export default class ChaseLedCanvasPreview extends LedCanvasPreview {
     chaseSpeed: number,
     chaseForegroundColor?: RGBColor,
   ) {
-    super(backgroundContext, canvasWidth, canvasHeight, backgroundColor, patternColors, ledCount, repitionFactor, colorGradientLengthFactor, loopCount);
+    super(
+      backgroundContext,
+      canvasWidth,
+      canvasHeight,
+      backgroundColor,
+      patternColors,
+      ledCount,
+      repitionFactor,
+      colorGradientLengthFactor,
+      loopCount,
+    );
 
     this.foregroundContext = foregroundContext;
     this.chaseForegroundColor = chaseForegroundColor;
@@ -81,7 +91,9 @@ export default class ChaseLedCanvasPreview extends LedCanvasPreview {
       previousTimeStamp = timeStamp;
       previousStartIndex = startIndex;
     }
-    this.animationRequestId = window.requestAnimationFrame(timeStamp => this.animateChase(timeStamp, previousStartIndex, previousTimeStamp));
+    this.animationRequestId = window.requestAnimationFrame(timeStamp =>
+      this.animateChase(timeStamp, previousStartIndex, previousTimeStamp),
+    );
   }
   private drawChase(startIndex: number) {
     let chaseIndex = 0;
@@ -131,7 +143,8 @@ export default class ChaseLedCanvasPreview extends LedCanvasPreview {
         if (chaseIndex < risingGradientExclusiveEndIndex) {
           alpha = (chaseIndex + 1) / (this.chaseGradientLength + 1);
         } else if (chaseIndex >= descendingGradientStartIndex) {
-          alpha = (descendingGradientStartIndex + this.chaseGradientLength - chaseIndex) / (this.chaseGradientLength + 1);
+          alpha =
+            (descendingGradientStartIndex + this.chaseGradientLength - chaseIndex) / (this.chaseGradientLength + 1);
         }
 
         if (alpha === null) {

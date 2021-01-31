@@ -1,7 +1,14 @@
 import { LEDPattern, ChaseLEDPattern } from "@/api";
 import LEDPatternImpl from "./LEDPatternImpl";
 import RGBColor from "./RGBColor";
-import { ChaseSpeedMin, ChaseSpeedMax, ChaseLengthFactorMin, ChaseLengthFactorMax, ChaseGradientLengthFactorMin, ChaseGradientLengthFactorMax } from "./LEDPatternConstraints";
+import {
+  ChaseSpeedMin,
+  ChaseSpeedMax,
+  ChaseLengthFactorMin,
+  ChaseLengthFactorMax,
+  ChaseGradientLengthFactorMin,
+  ChaseGradientLengthFactorMax,
+} from "./LEDPatternConstraints";
 import { getRandom } from "./RandomUtils";
 
 export default class ChaseLEDPatternImpl extends LEDPatternImpl implements ChaseLEDPattern {
@@ -14,7 +21,10 @@ export default class ChaseLEDPatternImpl extends LEDPatternImpl implements Chase
     super(pattern);
     this.patternType = "ChaseLEDPattern";
 
-    if (pattern !== undefined && (pattern instanceof ChaseLEDPatternImpl || ChaseLEDPatternImpl.instanceOfChaseLEDPattern(pattern))) {
+    if (
+      pattern !== undefined &&
+      (pattern instanceof ChaseLEDPatternImpl || ChaseLEDPatternImpl.instanceOfChaseLEDPattern(pattern))
+    ) {
       this.chaseSpeed = pattern.chaseSpeed;
       this.chaseLengthFactor = pattern.chaseLengthFactor;
       this.chaseGradientLengthFactor = pattern.chaseGradientLengthFactor;

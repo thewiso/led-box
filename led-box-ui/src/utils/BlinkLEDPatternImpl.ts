@@ -1,6 +1,11 @@
 import { BlinkLEDPattern, LEDPattern } from "@/api";
 import LEDPatternImpl from "./LEDPatternImpl";
-import { BlinkSpeedMin, BlinkSpeedMax, BlinkDimmingPeriodFactorMin, BlinkDimmingPeriodFactorMax } from "./LEDPatternConstraints";
+import {
+  BlinkSpeedMin,
+  BlinkSpeedMax,
+  BlinkDimmingPeriodFactorMin,
+  BlinkDimmingPeriodFactorMax,
+} from "./LEDPatternConstraints";
 import { getRandom } from "./RandomUtils";
 
 export default class BlinkLEDPatternImpl extends LEDPatternImpl implements BlinkLEDPattern {
@@ -11,7 +16,10 @@ export default class BlinkLEDPatternImpl extends LEDPatternImpl implements Blink
     super(pattern);
     this.patternType = "BlinkLEDPattern";
 
-    if (pattern !== undefined && (pattern instanceof BlinkLEDPatternImpl || BlinkLEDPatternImpl.instanceOfBlinkLEDPattern(pattern))) {
+    if (
+      pattern !== undefined &&
+      (pattern instanceof BlinkLEDPatternImpl || BlinkLEDPatternImpl.instanceOfBlinkLEDPattern(pattern))
+    ) {
       this.blinkSpeed = pattern.blinkSpeed;
       this.blinkDimmingPeriodFactor = pattern.blinkDimmingPeriodFactor;
     } else {

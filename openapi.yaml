@@ -36,6 +36,19 @@ paths:
                   $ref: "#/components/schemas/LEDPattern"
         "400":
           description: Bad Request
+    delete:
+      description: Delete all patterns
+      operationId: deleteAllPatterns
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: boolean
+              description: Flag indicating if the examples should be restored
+        required: false
+      responses:
+        "204":
+          description: No Content
   "/led-patterns/{id}":
     patch:
       operationId: updatePattern
@@ -52,8 +65,8 @@ paths:
               $ref: "#/components/schemas/LEDPattern"
         required: true
       responses:
-        "200":
-          description: Ok
+        "204":
+          description: No Content
         "400":
           description: Bad Request
         "404":
@@ -84,7 +97,7 @@ paths:
         required: true
       responses:
         "204":
-          description: Ok
+          description: No Content
         "400":
           description: Bad Request
         "404":
@@ -94,9 +107,16 @@ paths:
       operationId: stopPattern
       responses:
         "204":
-          description: Ok
+          description: No Content
         "404":
           description: Not Found
+  /server/shutdown:
+    post:
+      description: Shutdown server and hosting system
+      operationId: shutdownServer
+      responses:
+        "202":
+          description: Accepted
 components:
   schemas:
     LEDPattern:

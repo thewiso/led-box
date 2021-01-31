@@ -1,6 +1,13 @@
 import RGBColor from "./RGBColor";
 import { LEDPattern } from "@/api";
-import { ColorCountMin, ColorCountMax, RepititionFactorMin, RepititionFactorMax, ColorGradientLengthFactorMin, ChaseGradientLengthFactorMax } from "./LEDPatternConstraints";
+import {
+  ColorCountMin,
+  ColorCountMax,
+  RepititionFactorMin,
+  RepititionFactorMax,
+  ColorGradientLengthFactorMin,
+  ChaseGradientLengthFactorMax,
+} from "./LEDPatternConstraints";
 import { getRandomInt, getRandom } from "./RandomUtils";
 
 export default class LEDPatternImpl implements LEDPattern {

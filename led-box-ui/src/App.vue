@@ -10,7 +10,7 @@
 <template>
   <v-app>
     <v-app-bar app color="primary">
-      <v-icon large color="accent">mdi-led-on</v-icon>
+      <v-icon large color="accent" @click="handleAdminButtonClick()">mdi-led-on</v-icon>
       <v-toolbar-title class="app-bar-title">LED Manager</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-items>
@@ -84,6 +84,7 @@ export default Vue.extend({
   data: () => ({
     patternConfigurationDialogOpen: false,
     selectedPatternId: null as number | null,
+    adminButtonPressCounter: 0,
   }),
   methods: {
     createPattern: function() {
@@ -117,6 +118,12 @@ export default Vue.extend({
         ReadConstraintsFromOpenApiYaml(yamlDoc);
       } catch (e) {
         //TODO:
+      }
+    },
+    handleAdminButtonClick() {
+      if (++this.adminButtonPressCounter >= 5) {
+        this.adminButtonPressCounter = 0;
+        this.$router.push("/admin");
       }
     },
   },
