@@ -5,7 +5,7 @@
     <v-container fluid>
       <v-row>
         <v-col cols="12">
-          <v-btn color="primary">
+          <v-btn color="primary" @click="navigateBack()">
             <v-icon left>mdi-chevron-double-left</v-icon>
             Back
           </v-btn>
@@ -18,7 +18,7 @@
             <v-card-text>
               <v-row align="center">
                 <v-col cols="auto">
-                  <v-btn depressed color="error" :disabled="!shutdownArmed">
+                  <v-btn depressed color="error" :disabled="!shutdownArmed" @click="shutdown()">
                     Shutdown
                   </v-btn>
                 </v-col>
@@ -38,22 +38,22 @@
             <v-card-text>
               <v-row align="center">
                 <v-col cols="auto">
-                  <v-btn depressed color="error" :disabled="!restoreDatabaseArmed">
+                  <v-btn depressed color="error" :disabled="!resetDatabaseArmed" @click="resetDatabase()">
                     Reset
                   </v-btn>
                 </v-col>
                 <v-col cols="auto">
-                  <v-checkbox v-model="restoreDatabaseArmed" label="Arm button (Danger!)"></v-checkbox>
+                  <v-checkbox v-model="resetDatabaseArmed" label="Arm button (Danger!)"></v-checkbox>
                 </v-col>
               </v-row>
               <v-row align="center">
                 <v-col cols="auto">
-                  <v-btn depressed color="error" :disabled="!deleteDatabaseArmed">
+                  <v-btn depressed color="error" :disabled="!clearDatabaseArmed" @click="clearDatabase()">
                     Delete everything
                   </v-btn>
                 </v-col>
                 <v-col cols="auto">
-                  <v-checkbox v-model="deleteDatabaseArmed" label="Arm button (Danger!)"></v-checkbox>
+                  <v-checkbox v-model="clearDatabaseArmed" label="Arm button (Danger!)"></v-checkbox>
                 </v-col>
               </v-row>
             </v-card-text>
@@ -75,20 +75,38 @@ export default Vue.extend({
 
   mounted: function() {
     this.shutdownArmed = false;
-    this.restoreDatabaseArmed = false;
-    this.deleteDatabaseArmed = false;
+    this.resetDatabaseArmed = false;
+    this.clearDatabaseArmed = false;
   },
 
   data: () => ({
     shutdownArmed: false,
-    restoreDatabaseArmed: false,
-    deleteDatabaseArmed: false,
+    resetDatabaseArmed: false,
+    clearDatabaseArmed: false,
   }),
   methods: {
-    handleAdminButtonClick() {
-      LedBoxApi.stopPattern()
-        .catch //TODO: snackbar error
-        ();
+    navigateBack() {
+      this.$router.push("/");
+    },
+    shutdown() {
+      LedBoxApi.shutdownServer().catch(); //TODO:;
+      this.shutdownArmed = false;
+    },
+    resetDatabase() {
+      LedBoxApi.deleteAllPatterns({ body: true })
+        .then(() => this.fetchData())
+        .catch(); //TODO:
+      this.resetDatabaseArmed = false;
+    },
+    clearDatabase() {
+      LedBoxApi.deleteAllPatterns({ body: false })
+        .then(() => this.fetchData())
+        .catch(); //TODO:
+      this.clearDatabaseArmed = false;
+    },
+    fetchData() {
+      LedBoxApi.getPatterns().catch(); //TODO: snackbar error
+      LedBoxApi.getActivePattern().catch(); //TODO: snackbar error
     },
   },
 });
