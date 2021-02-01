@@ -1,4 +1,8 @@
-<style scoped></style>
+<style scoped>
+.buttonRow {
+  margin-bottom: 30px;
+}
+</style>
 
 <template>
   <v-app>
@@ -16,13 +20,13 @@
           <v-card outlined>
             <v-card-title>Server</v-card-title>
             <v-card-text>
-              <v-row align="center">
-                <v-col cols="auto">
+              <v-row align="center" no-gutters>
+                <v-col cols="12">
                   <v-btn depressed color="error" :disabled="!shutdownArmed" @click="shutdown()">
                     Shutdown
                   </v-btn>
                 </v-col>
-                <v-col cols="auto">
+                <v-col cols="12">
                   <v-checkbox v-model="shutdownArmed" label="Arm button (Danger!)"></v-checkbox>
                 </v-col>
               </v-row>
@@ -36,18 +40,18 @@
           <v-card outlined>
             <v-card-title>Database</v-card-title>
             <v-card-text>
-              <v-row align="center">
-                <v-col cols="auto">
+              <v-row align="center" no-gutters class="buttonRow">
+                <v-col cols="12">
                   <v-btn depressed color="error" :disabled="!resetDatabaseArmed" @click="resetDatabase()">
                     Reset
                   </v-btn>
                 </v-col>
-                <v-col cols="auto">
+                <v-col cols="12">
                   <v-checkbox v-model="resetDatabaseArmed" label="Arm button (Danger!)"></v-checkbox>
                 </v-col>
               </v-row>
-              <v-row align="center">
-                <v-col cols="auto">
+              <v-row align="center" no-gutters>
+                <v-col cols="12">
                   <v-btn depressed color="error" :disabled="!clearDatabaseArmed" @click="clearDatabase()">
                     Delete everything
                   </v-btn>
