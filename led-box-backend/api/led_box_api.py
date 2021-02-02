@@ -7,6 +7,7 @@ import json
 from typing import Tuple, Any, List
 import logging
 import led_controller.pattern_controller as pattern_controller
+import subprocess
 
 __LOG = logging.getLogger(__name__)
 
@@ -72,3 +73,24 @@ def stop_pattern():
     pattern_controller.stop_pattern_display()
 
     return None, 204
+
+
+def deleteAllPatterns(body):
+    __LOG.info("Received 'deleteAllPatterns' request")
+    __LOG.debug(body)
+
+    led_box_db.drop_and_create_tables()
+    if(body == True):
+        led_box_db.insert_example_pattern()
+
+
+def shutdownServer():
+    __LOG.info("Received 'shutdownServer' request")
+
+    pattern_controller.stop_pattern_display()
+    __LOG.info("Shutting down system...")
+    completed_process = subprocess.run(
+        "sudo shutdown -h now", shell=True, capture_output=True, text=True)
+
+    if completed_process.returncode != 0:
+        __LOG.info(f"Could not shutdown system: {completed_process.stdout}")
