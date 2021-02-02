@@ -28,6 +28,7 @@
 import Vue from "vue";
 import yaml from "js-yaml";
 import { ReadConstraintsFromOpenApiYaml } from "@/utils/LEDPatternConstraints";
+import LedBoxApi from "@/utils/LedBoxApi";
 
 export default Vue.extend({
   name: "App",
@@ -57,6 +58,10 @@ export default Vue.extend({
         this.adminButtonPressCounter = 0;
         this.$router.push("/admin");
       }
+    },
+    fetchData() {
+      LedBoxApi.getPatterns().catch(); //TODO: snackbar error
+      LedBoxApi.getActivePattern().catch(); //TODO: snackbar error
     },
   },
 });

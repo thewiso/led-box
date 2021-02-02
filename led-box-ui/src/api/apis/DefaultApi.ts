@@ -25,7 +25,7 @@ export interface CreatePatternRequest {
 }
 
 export interface DeleteAllPatternsRequest {
-    body?: boolean;
+    restoreExamples?: boolean;
 }
 
 export interface RunPatternRequest {
@@ -79,16 +79,17 @@ export class DefaultApi extends runtime.BaseAPI {
     async deleteAllPatternsRaw(requestParameters: DeleteAllPatternsRequest): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
-        const headerParameters: runtime.HTTPHeaders = {};
+        if (requestParameters.restoreExamples !== undefined) {
+            queryParameters['restoreExamples'] = requestParameters.restoreExamples;
+        }
 
-        headerParameters['Content-Type'] = 'application/json';
+        const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
             path: `/led-patterns`,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
-            body: requestParameters.body as any,
         });
 
         return new runtime.VoidApiResponse(response);

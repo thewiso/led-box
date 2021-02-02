@@ -75,17 +75,17 @@ def stop_pattern():
     return None, 204
 
 
-def deleteAllPatterns(body):
-    __LOG.info("Received 'deleteAllPatterns' request")
-    __LOG.debug(body)
+def delete_all_patterns(restore_examples=None):
+    __LOG.info("Received 'delete_all_patterns' request")
+    __LOG.debug(restore_examples)
 
     led_box_db.drop_and_create_tables()
-    if(body == True):
+    if(restore_examples == True):
         led_box_db.insert_example_pattern()
 
 
-def shutdownServer():
-    __LOG.info("Received 'shutdownServer' request")
+def shutdown_server():
+    __LOG.info("Received 'shutdown_server' request")
 
     pattern_controller.stop_pattern_display()
     __LOG.info("Shutting down system...")

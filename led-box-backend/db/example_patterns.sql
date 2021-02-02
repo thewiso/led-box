@@ -20,7 +20,7 @@ INSERT INTO LED_PATTERN (JSON) VALUES ('{
 	"repitionFactor": 0,
 	"colorGradientLengthFactor": 0.3,
 	"patternType": "LEDPattern"
-}')
+}');
 
 INSERT INTO LED_PATTERN (JSON) VALUES ('{
 	"name": "blink_animation",
@@ -46,7 +46,7 @@ INSERT INTO LED_PATTERN (JSON) VALUES ('{
 	"patternType": "BlinkLEDPattern",
 	"blinkSpeed": 0.1,
 	"blinkDimmingPeriodFactor": 0.5
-}')
+}');
 
 INSERT INTO LED_PATTERN (JSON) VALUES ('{
 	"name": "chase_animation",
@@ -73,4 +73,4 @@ INSERT INTO LED_PATTERN (JSON) VALUES ('{
 	"chaseSpeed": 20,
 	"chaseLengthFactor": 0.2,
 	"chaseGradientLengthFactor": 0.25
-}')
+}');

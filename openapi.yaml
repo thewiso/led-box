@@ -39,13 +39,13 @@ paths:
     delete:
       description: Delete all patterns
       operationId: deleteAllPatterns
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: boolean
-              description: Flag indicating if the examples should be restored
-        required: false
+      parameters:
+        - in: query
+          name: restoreExamples
+          description: Flag indicating if the examples should be restored
+          schema:
+            type: boolean
+          required: false
       responses:
         "204":
           description: No Content

@@ -97,13 +97,13 @@ export default Vue.extend({
       this.shutdownArmed = false;
     },
     resetDatabase() {
-      LedBoxApi.deleteAllPatterns({ body: true })
+      LedBoxApi.deleteAllPatterns({ restoreExamples: true })
         .then(() => this.fetchData())
         .catch(); //TODO:
       this.resetDatabaseArmed = false;
     },
     clearDatabase() {
-      LedBoxApi.deleteAllPatterns({ body: false })
+      LedBoxApi.deleteAllPatterns({ restoreExamples: false })
         .then(() => this.fetchData())
         .catch(); //TODO:
       this.clearDatabaseArmed = false;
