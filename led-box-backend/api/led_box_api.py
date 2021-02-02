@@ -90,7 +90,7 @@ def shutdown_server():
     pattern_controller.stop_pattern_display()
     __LOG.info("Shutting down system...")
     completed_process = subprocess.run(
-        "sudo shutdown -h now", shell=True, capture_output=True, text=True)
+        "/usr/bin/sudo /usr/sbin/shutdown -h now", shell=True, capture_output=True, text=True)
 
     if completed_process.returncode != 0:
-        __LOG.info(f"Could not shutdown system: {completed_process.stdout}")
+        __LOG.info(f"Could not shutdown system: {completed_process.stderr}")
