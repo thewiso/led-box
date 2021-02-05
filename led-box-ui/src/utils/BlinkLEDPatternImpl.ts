@@ -28,6 +28,10 @@ export default class BlinkLEDPatternImpl extends LEDPatternImpl implements Blink
     }
   }
 
+  public clone(): LEDPatternImpl {
+    return new BlinkLEDPatternImpl(this);
+  }
+
   public static createRandomPattern(pattern?: LEDPatternImpl) {
     let randomPattern: BlinkLEDPatternImpl;
     if (pattern !== undefined) {

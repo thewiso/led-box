@@ -37,7 +37,11 @@
       <v-icon>mdi-plus</v-icon>
     </v-btn>
     <v-dialog v-model="patternConfigurationDialogOpen" fullscreen hide-overlay transition="dialog-bottom-transition">
-      <PatternConfiguration @configurationFinished="closeConfigurationDialog()" :patternId="selectedPatternId" />
+      <PatternConfiguration
+        @configurationFinished="closeConfigurationDialog()"
+        :patternId="selectedPatternId"
+        :reloadPatternIdTimestamp="reloadConfigurationPatternIdTimestamp"
+      />
     </v-dialog>
   </v-container>
 </template>
@@ -61,15 +65,9 @@ export default Vue.extend({
   data: () => ({
     patternConfigurationDialogOpen: false,
     selectedPatternId: null as number | null,
+    reloadConfigurationPatternIdTimestamp: undefined as undefined | number,
   }),
   methods: {
-    createPattern: function() {
-      this.selectedPatternId = null;
-      this.patternConfigurationDialogOpen = true;
-    },
-    closeConfigurationDialog: function() {
-      this.patternConfigurationDialogOpen = false;
-    },
     fetchData: function() {
       LedBoxApi.getPatterns().catch(); //TODO: snackbar error
       LedBoxApi.getActivePattern().catch(); //TODO: snackbar error
@@ -84,9 +82,19 @@ export default Vue.extend({
         .catch //TODO: snackbar error
         ();
     },
+    createPattern: function() {
+      this.startConfigurationDialog(null);
+    },
     editPattern: function(patternId: number) {
+      this.startConfigurationDialog(patternId);
+    },
+    startConfigurationDialog: function(patternId: number | null) {
       this.selectedPatternId = patternId;
+      this.reloadConfigurationPatternIdTimestamp = Date.now();
       this.patternConfigurationDialogOpen = true;
+    },
+    closeConfigurationDialog: function() {
+      this.patternConfigurationDialogOpen = false;
     },
   },
   computed: {

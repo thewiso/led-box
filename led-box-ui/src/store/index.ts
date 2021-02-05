@@ -19,6 +19,12 @@ const store = new Vuex.Store({
     setActivePatternId(state, activePatternId) {
       state.activePatternId = activePatternId;
     },
+    setPattern(state, pattern: LEDPattern) {
+      const index = state.ledPatterns.findIndex(ledPattern => ledPattern.id === pattern.id);
+      if (index >= 0) {
+        state.ledPatterns[index] = pattern;
+      }
+    },
   },
   actions: {},
   getters: {

@@ -29,9 +29,7 @@ export default class ChaseLEDPatternImpl extends LEDPatternImpl implements Chase
       this.chaseLengthFactor = pattern.chaseLengthFactor;
       this.chaseGradientLengthFactor = pattern.chaseGradientLengthFactor;
 
-      if (pattern instanceof ChaseLEDPatternImpl) {
-        this.chaseForeground = pattern.chaseForeground;
-      } else if (pattern.chaseForeground !== undefined) {
+      if (pattern.chaseForeground !== undefined) {
         this.chaseForeground = RGBColor.fromApiModelColor(pattern.chaseForeground);
       }
     } else {
@@ -39,6 +37,10 @@ export default class ChaseLEDPatternImpl extends LEDPatternImpl implements Chase
       this.chaseLengthFactor = ChaseLengthFactorMin;
       this.chaseGradientLengthFactor = ChaseGradientLengthFactorMin;
     }
+  }
+
+  public clone(): LEDPatternImpl {
+    return new ChaseLEDPatternImpl(this);
   }
 
   public static createRandomPattern(pattern?: LEDPatternImpl) {

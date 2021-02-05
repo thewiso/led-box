@@ -22,10 +22,10 @@
       <v-toolbar-title>Edit Pattern</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-items>
-        <v-btn icon @click="savePattern()">
+        <v-btn icon @click="savePattern()" :disabled="!isPatternValid">
           <v-icon large>mdi-content-save-outline</v-icon>
         </v-btn>
-        <v-btn icon @click="saveAndPlayPattern()">
+        <v-btn icon @click="saveAndPlayPattern()" :disabled="!isPatternValid">
           <v-icon large>mdi-play-circle-outline</v-icon>
         </v-btn>
       </v-toolbar-items>
@@ -40,6 +40,20 @@
                 :ledPattern="ledPattern"
                 :ledPatternChangeTimestamp="ledPatternChangeTimestamp"
               ></LedPreview>
+            </v-container>
+          </v-card>
+        </v-col>
+        <v-col cols="12">
+          <v-card color="secondary">
+            <v-card-title>General</v-card-title>
+            <v-container>
+              <v-text-field
+                v-model="ledPattern.name"
+                label="Name"
+                required
+                clearable
+                :rules="rules.name"
+              ></v-text-field>
             </v-container>
           </v-card>
         </v-col>
@@ -279,6 +293,9 @@ export default Vue.extend({
       type: Number,
       default: null,
     },
+    reloadPatternIdTimestamp: {
+      type: Number,
+    },
   },
   data: () => ({
     ledPattern: LEDPatternImpl.createRandomPattern(),
@@ -309,6 +326,17 @@ export default Vue.extend({
 
     addColorIdentifier: ColorIdentifier.ADD_COLOR,
     editChaseForegroundColorIdentifier: ColorIdentifier.EDIT_CHASE_FOREGROUND_COLOR,
+
+    rules: {
+      name: [
+        (name: string) => {
+          if ((name || "").trim().length == 0) {
+            return "Must contain any character except whitespace";
+          }
+          return true;
+        },
+      ],
+    },
   }),
   computed: {
     isPatternChaseColor: {
@@ -347,6 +375,11 @@ export default Vue.extend({
             this.ledPattern = ChaseLEDPatternImpl.createRandomPattern(this.ledPattern);
             break;
         }
+      },
+    },
+    isPatternValid: {
+      get: function() {
+        return (this.ledPattern.name || "").trim().length > 0;
       },
     },
   },
@@ -414,6 +447,7 @@ export default Vue.extend({
         const savedPatternId = this.ledPattern.id;
         return LedBoxApi.updatePattern({ id: this.ledPattern.id, lEDPattern: this.ledPattern })
           .then(() => {
+            this.$store.commit("setPattern", this.ledPattern);
             this.close();
             return savedPatternId;
           })
@@ -443,13 +477,13 @@ export default Vue.extend({
     },
   },
   watch: {
-    patternId: {
+    reloadPatternIdTimestamp: {
       immediate: true,
-      handler(newVal: number | null) {
-        if (newVal === null) {
+      handler() {
+        if (this.patternId === null) {
           this.ledPattern = LEDPatternImpl.createRandomPattern();
         } else {
-          this.ledPattern = this.$store.getters.getPatternById(this.patternId);
+          this.ledPattern = this.$store.getters.getPatternById(this.patternId).clone();
           if (this.ledPattern === undefined) {
             console.error(`No pattern was found for given id ${this.patternId}`);
             this.closePickColorDialog();

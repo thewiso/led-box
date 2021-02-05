@@ -24,12 +24,7 @@ export default class LEDPatternImpl implements LEDPattern {
       this.name = pattern.name;
       this.repitionFactor = pattern.repitionFactor;
       this.colorGradientLengthFactor = pattern.colorGradientLengthFactor;
-
-      if (pattern instanceof LEDPatternImpl) {
-        this.colors = pattern.colors;
-      } else {
-        this.colors = pattern.colors.map(RGBColor.fromApiModelColor);
-      }
+      this.colors = pattern.colors.map(RGBColor.fromApiModelColor);
     } else {
       this.colors = [];
       this.repitionFactor = RepititionFactorMin;
@@ -80,6 +75,10 @@ export default class LEDPatternImpl implements LEDPattern {
         this.colors.splice(index, 1);
       }
     }
+  }
+
+  public clone(): LEDPatternImpl {
+    return new LEDPatternImpl(this);
   }
 
   public static createRandomPattern() {
