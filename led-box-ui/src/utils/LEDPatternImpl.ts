@@ -10,6 +10,68 @@ import {
 } from "./LEDPatternConstraints";
 import { getRandomInt, getRandom } from "./RandomUtils";
 
+const EXAMPLE_NAMES = [
+  [
+    "Beautiful",
+    "Relaxing",
+    "Easy",
+    "Cool",
+    "Lovely",
+    "Mysterious",
+    "Glimmering",
+    "Thoughtful",
+    "Shining",
+    "Joyful",
+    "Charming",
+    "Breathtaking",
+    "Calm",
+    "Romantic",
+    "Impressive",
+    "Elegant",
+    "Lively",
+    "Pleasing",
+    "Pretty",
+    "Magical",
+  ],
+  [
+    "Dream",
+    "Spring",
+    "Summer",
+    "Dawn",
+    "Aurora",
+    "Bloom",
+    "Sunset",
+    "Ascent",
+    "Charm",
+    "Stream",
+    "View",
+    "Essence",
+    "Fantasy",
+    "Gloss",
+    "Sensation",
+    "Shine",
+    "Spark",
+    "Spirit",
+    "Silence",
+    "Relief",
+  ],
+];
+
+function createRandomName(): string {
+  let name = "";
+  EXAMPLE_NAMES.forEach(nameGroup => {
+    const nameIndex = getRandomInt(0, nameGroup.length - 1);
+
+    if (name.length > 0) {
+      name = name + " " + nameGroup[nameIndex];
+    } else {
+      name = nameGroup[nameIndex];
+    }
+  });
+
+  return name;
+}
+
 export default class LEDPatternImpl implements LEDPattern {
   public id?: number;
   public colors: RGBColor[];
@@ -93,7 +155,7 @@ export default class LEDPatternImpl implements LEDPattern {
     randomPattern.colorGradientLengthFactor = getRandom(ColorGradientLengthFactorMin, ChaseGradientLengthFactorMax);
 
     //TODO: nice example names
-    randomPattern.name = "Foobar";
+    randomPattern.name = createRandomName();
 
     return randomPattern;
   }
