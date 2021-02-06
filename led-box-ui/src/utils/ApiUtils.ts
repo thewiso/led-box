@@ -25,3 +25,11 @@ export function LEDPatternToJSON(value?: LEDPattern | null): any {
     return LEDPatternToJSONDefault(value);
   }
 }
+
+export class NumberApiResponse {
+  constructor(public raw: Response) {}
+
+  async value(): Promise<number> {
+    return parseInt(await this.raw.text());
+  }
+}

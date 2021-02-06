@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import {
   DefaultApi,
   LEDPattern,
@@ -13,7 +11,7 @@ import store from "@/store";
 import BlinkLEDPatternImpl from "@/utils/BlinkLEDPatternImpl";
 import ChaseLEDPatternImpl from "@/utils/ChaseLEDPatternImpl";
 import LEDPatternImpl from "@/utils/LEDPatternImpl";
-import { LEDPatternToJSON } from "@/utils/JSONUtils";
+import { LEDPatternToJSON, NumberApiResponse } from "@/utils/ApiUtils";
 
 const BASE_PATH =
   process.env.VUE_APP_API_BASE_PATH_USE_WINDOW_LOCATION == "true"
@@ -74,7 +72,7 @@ const LedBoxApi = new (class extends DefaultApi {
         "Required parameter requestParameters.lEDPattern was null or undefined when calling createPattern.",
       );
     }
-    const queryParameters: any = {};
+    const queryParameters = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
 
@@ -88,7 +86,7 @@ const LedBoxApi = new (class extends DefaultApi {
       body: LEDPatternToJSON(requestParameters.lEDPattern),
     });
 
-    return new runtime.TextApiResponse(response) as any;
+    return new NumberApiResponse(response);
   }
 
   async updatePatternRaw(requestParameters: UpdatePatternRequest): Promise<runtime.ApiResponse<void>> {
@@ -106,7 +104,7 @@ const LedBoxApi = new (class extends DefaultApi {
       );
     }
 
-    const queryParameters: any = {};
+    const queryParameters = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
 
@@ -121,6 +119,21 @@ const LedBoxApi = new (class extends DefaultApi {
     });
 
     return new runtime.VoidApiResponse(response);
+  }
+
+  async getActivePatternRaw(): Promise<runtime.ApiResponse<number>> {
+    const queryParameters = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    const response = await this.request({
+      path: `/led-patterns/active`,
+      method: "GET",
+      headers: headerParameters,
+      query: queryParameters,
+    });
+
+    return new NumberApiResponse(response);
   }
 })();
 export default LedBoxApi;
