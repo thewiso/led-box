@@ -29,48 +29,41 @@ __leds.brightness = 1
 
 
 def start_pattern_display(led_pattern: LEDPattern):
-	__pattern_lock.acquire()
+	with __pattern_lock:
+		global __pattern_animator
 
-	global __pattern_animator
+		if __pattern_animator is not None:
+			__pattern_animator.stop()
 
-	if __pattern_animator is not None:
-		__pattern_animator.stop()
+		if isinstance(led_pattern, LEDPattern):
+			__pattern_animator = PatternAnimatorNone(__leds, led_pattern)
+		elif isinstance(led_pattern, BlinkLEDPattern):
+			__pattern_animator = PatternAnimatorBlink(
+				__leds, led_pattern)
+		elif isinstance(led_pattern, ChaseLEDPattern):
+			__pattern_animator = PatternAnimatorChase(
+				__leds, led_pattern)
 
-	if isinstance(led_pattern, LEDPattern):
-		__pattern_animator = PatternAnimatorNone(__leds, led_pattern)
-	elif isinstance(led_pattern, BlinkLEDPattern):
-		__pattern_animator = PatternAnimatorBlink(
-			__leds, led_pattern)
-	elif isinstance(led_pattern, ChaseLEDPattern):
-		__pattern_animator = PatternAnimatorChase(
-			__leds, led_pattern)
+		__LOG.info(
+		"Starting new animation: {}...".format(led_pattern.pattern_type))
 
-	__LOG.info(
-	"Starting new animation: {}...".format(led_pattern.pattern_type))
-
-	try:
-		__pattern_animator.start()
-	except (KeyboardInterrupt, SystemExit):
-		__pattern_animator.stop()
-		sys.exit()
-		
-	__pattern_lock.release()
+		__pattern_animator.start()	
 
 
 def stop_pattern_display():
-	__pattern_lock.acquire()
-	global __pattern_animator
+	with __pattern_lock:
+		global __pattern_animator
 
-	if __pattern_animator is not None:
-		__pattern_animator.stop()
-		__pattern_animator = None
-	__pattern_lock.release()
+		if __pattern_animator is not None:
+			__pattern_animator.stop()
+			__pattern_animator = None
 
 
 def get_active_pattern_id():
-	global __pattern_animator
+	with __pattern_lock:
+		global __pattern_animator
 
-	if __pattern_animator is not None:
-		return __pattern_animator.get_pattern_id()
-	else:
-		return None
+		if __pattern_animator is not None:
+			return __pattern_animator.get_pattern_id()
+		else:
+			return None
