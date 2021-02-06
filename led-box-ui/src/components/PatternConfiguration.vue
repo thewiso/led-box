@@ -491,6 +491,7 @@ export default Vue.extend({
         } else {
           this.ledPattern = this.$store.getters.getPatternById(this.patternId).clone();
           if (this.ledPattern === undefined) {
+            //TODO:
             console.error(`No pattern was found for given id ${this.patternId}`);
             this.closePickColorDialog();
           }
