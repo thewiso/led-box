@@ -37,7 +37,7 @@ class PatternAnimatorChase(PatternAnimator):
         self.get_chase_color = self.create_chase_color_provider()
 
     def start(self):
-        PatternAnimatorChase.LOG.debug("Starting pattern animation...")
+        PatternAnimatorChase.LOG.info("Starting pattern animation...")
         self.clear_leds()
 
         self.fill_and_show_leds(self.background_color_list)
@@ -47,16 +47,16 @@ class PatternAnimatorChase(PatternAnimator):
                 0.1, self.chase, args=(0, int(round(time.time() * 1000))))
             self.timer.start()
 
-        PatternAnimatorChase.LOG.debug("Started pattern animation")
+        PatternAnimatorChase.LOG.info("Started pattern animation")
 
     def stop(self):
-        PatternAnimatorChase.LOG.debug("Stopping pattern animation...")
+        PatternAnimatorChase.LOG.info("Stopping pattern animation...")
         if(self.timer is not None):
             with self.timer_lock:
                 self.timer.cancel()
 
             self.clear_leds()
-        PatternAnimatorChase.LOG.debug("Stopped pattern animation")
+        PatternAnimatorChase.LOG.info("Stopped pattern animation")
 
     def chase(self, previous_chase_start_index: int, previous_time_stamp: int):
         timestamp = int(round(time.time() * 1000))
