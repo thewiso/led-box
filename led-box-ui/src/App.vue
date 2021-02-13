@@ -26,43 +26,42 @@
 
 <script lang="ts">
 import Vue from "vue";
+import Component from "vue-class-component";
 import yaml from "js-yaml";
 import { ReadConstraintsFromOpenApiYaml } from "@/utils/LEDPatternConstraints";
 import LedBoxApi from "@/utils/LedBoxApi";
 
-export default Vue.extend({
-  name: "App",
+//TODO: use class components
+@Component
+export default class App extends Vue {
+  adminButtonPressCounter = 0;
 
-  mounted: function() {
+  mounted() {
+    //TODO: check url
     fetch(process.env.VUE_APP_API_BASE_PATH + "/openapi.yaml")
       .then(response => response.text())
       .then(this.parseModelRangesFromYaml)
       .catch //TODO:
       ();
-  },
+  }
 
-  data: () => ({
-    adminButtonPressCounter: 0,
-  }),
-  methods: {
-    parseModelRangesFromYaml(yamlString: string) {
-      try {
-        const yamlDoc = yaml.load(yamlString);
-        ReadConstraintsFromOpenApiYaml(yamlDoc);
-      } catch (e) {
-        //TODO:
-      }
-    },
-    handleAdminButtonClick() {
-      if (++this.adminButtonPressCounter >= 5) {
-        this.adminButtonPressCounter = 0;
-        this.$router.push("/admin");
-      }
-    },
-    fetchData() {
-      LedBoxApi.getPatterns().catch(); //TODO: snackbar error
-      LedBoxApi.getActivePattern().catch(); //TODO: snackbar error
-    },
-  },
-});
+  parseModelRangesFromYaml(yamlString: string) {
+    try {
+      const yamlDoc = yaml.load(yamlString);
+      ReadConstraintsFromOpenApiYaml(yamlDoc);
+    } catch (e) {
+      //TODO:
+    }
+  }
+  handleAdminButtonClick() {
+    if (++this.adminButtonPressCounter >= 5) {
+      this.adminButtonPressCounter = 0;
+      this.$router.push("/admin");
+    }
+  }
+  fetchData() {
+    LedBoxApi.getPatterns().catch(); //TODO: snackbar error
+    LedBoxApi.getActivePattern().catch(); //TODO: snackbar error
+  }
+}
 </script>

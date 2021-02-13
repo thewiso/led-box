@@ -70,48 +70,42 @@
 
 <script lang="ts">
 import Vue from "vue";
+import Component from "vue-class-component";
 import LedBoxApi from "@/utils/LedBoxApi";
 
-export default Vue.extend({
-  name: "AdminPanel",
-
-  components: {},
-
-  mounted: function() {
+@Component
+export default class AdminPanel extends Vue {
+  shutdownArmed = false;
+  resetDatabaseArmed = false;
+  clearDatabaseArmed = false;
+  mounted() {
     this.shutdownArmed = false;
     this.resetDatabaseArmed = false;
     this.clearDatabaseArmed = false;
-  },
+  }
 
-  data: () => ({
-    shutdownArmed: false,
-    resetDatabaseArmed: false,
-    clearDatabaseArmed: false,
-  }),
-  methods: {
-    navigateBack() {
-      this.$router.push("/");
-    },
-    shutdown() {
-      LedBoxApi.shutdownServer().catch(); //TODO:;
-      this.shutdownArmed = false;
-    },
-    resetDatabase() {
-      LedBoxApi.deleteAllPatterns({ restoreExamples: true })
-        .then(() => this.fetchData())
-        .catch(); //TODO:
-      this.resetDatabaseArmed = false;
-    },
-    clearDatabase() {
-      LedBoxApi.deleteAllPatterns({ restoreExamples: false })
-        .then(() => this.fetchData())
-        .catch(); //TODO:
-      this.clearDatabaseArmed = false;
-    },
-    fetchData() {
-      LedBoxApi.getPatterns().catch(); //TODO: snackbar error
-      LedBoxApi.getActivePattern().catch(); //TODO: snackbar error
-    },
-  },
-});
+  navigateBack() {
+    this.$router.push("/");
+  }
+  shutdown() {
+    LedBoxApi.shutdownServer().catch(); //TODO:;
+    this.shutdownArmed = false;
+  }
+  resetDatabase() {
+    LedBoxApi.deleteAllPatterns({ restoreExamples: true })
+      .then(() => this.fetchData())
+      .catch(); //TODO:
+    this.resetDatabaseArmed = false;
+  }
+  clearDatabase() {
+    LedBoxApi.deleteAllPatterns({ restoreExamples: false })
+      .then(() => this.fetchData())
+      .catch(); //TODO:
+    this.clearDatabaseArmed = false;
+  }
+  fetchData() {
+    LedBoxApi.getPatterns().catch(); //TODO: snackbar error
+    LedBoxApi.getActivePattern().catch(); //TODO: snackbar error
+  }
+}
 </script>

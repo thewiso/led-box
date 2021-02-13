@@ -48,62 +48,54 @@
 
 <script lang="ts">
 import Vue from "vue";
+import Component from "vue-class-component";
 import PatternConfiguration from "@/components/PatternConfiguration.vue";
 import LedBoxApi from "@/utils/LedBoxApi";
 
-export default Vue.extend({
-  name: "PatternOvierview",
+@Component({ components: { PatternConfiguration } })
+export default class PatternOvierview extends Vue {
+  patternConfigurationDialogOpen = false;
+  selectedPatternId = null as number | null;
+  reloadConfigurationPatternIdTimestamp = Date.now();
 
-  components: {
-    PatternConfiguration,
-  },
-
-  mounted: function() {
+  mounted() {
     this.fetchData();
-  },
+  }
 
-  data: () => ({
-    patternConfigurationDialogOpen: false,
-    selectedPatternId: null as number | null,
-    reloadConfigurationPatternIdTimestamp: undefined as undefined | number,
-  }),
-  methods: {
-    fetchData: function() {
-      LedBoxApi.getPatterns().catch(); //TODO: snackbar error
-      LedBoxApi.getActivePattern().catch(); //TODO: snackbar error
-    },
-    startPattern(patternId: number) {
-      LedBoxApi.runPattern({ body: patternId })
-        .catch //TODO: snackbar error
-        ();
-    },
-    stopPattern() {
-      LedBoxApi.stopPattern()
-        .catch //TODO: snackbar error
-        ();
-    },
-    createPattern: function() {
-      this.startConfigurationDialog(null);
-    },
-    editPattern: function(patternId: number) {
-      this.startConfigurationDialog(patternId);
-    },
-    startConfigurationDialog: function(patternId: number | null) {
-      this.selectedPatternId = patternId;
-      this.reloadConfigurationPatternIdTimestamp = Date.now();
-      this.patternConfigurationDialogOpen = true;
-    },
-    closeConfigurationDialog: function() {
-      this.patternConfigurationDialogOpen = false;
-    },
-  },
-  computed: {
-    activePatternId() {
-      return this.$store.state.activePatternId;
-    },
-    ledPatterns() {
-      return this.$store.state.ledPatterns;
-    },
-  },
-});
+  fetchData() {
+    LedBoxApi.getPatterns().catch(); //TODO: snackbar error
+    LedBoxApi.getActivePattern().catch(); //TODO: snackbar error
+  }
+  startPattern(patternId: number) {
+    LedBoxApi.runPattern({ body: patternId })
+      .catch //TODO: snackbar error
+      ();
+  }
+  stopPattern() {
+    LedBoxApi.stopPattern()
+      .catch //TODO: snackbar error
+      ();
+  }
+  createPattern() {
+    this.startConfigurationDialog(null);
+  }
+  editPattern(patternId: number) {
+    this.startConfigurationDialog(patternId);
+  }
+  startConfigurationDialog(patternId: number | null) {
+    this.selectedPatternId = patternId;
+    this.reloadConfigurationPatternIdTimestamp = Date.now();
+    this.patternConfigurationDialogOpen = true;
+  }
+  closeConfigurationDialog() {
+    this.patternConfigurationDialogOpen = false;
+  }
+
+  get activePatternId() {
+    return this.$store.state.activePatternId;
+  }
+  get ledPatterns() {
+    return this.$store.state.ledPatterns;
+  }
+}
 </script>
