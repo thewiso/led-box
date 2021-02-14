@@ -3,7 +3,7 @@ import {
   LEDPatternToJSON as LEDPatternToJSONDefault,
   BlinkLEDPatternToJSON,
   ChaseLEDPatternToJSON,
-} from "@/api";
+} from "@/api/gen";
 
 import BlinkLEDPatternImpl from "@/utils/BlinkLEDPatternImpl";
 import ChaseLEDPatternImpl from "@/utils/ChaseLEDPatternImpl";

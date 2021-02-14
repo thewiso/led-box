@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import { LEDPattern } from "@/api/index";
+import { LEDPattern } from "@/api/gen";
 
 Vue.use(Vuex);
 

@@ -1,2 +1,2 @@
 #The api is generated, so nothing should be changed here
-src/api/*
+src/api/gen/*

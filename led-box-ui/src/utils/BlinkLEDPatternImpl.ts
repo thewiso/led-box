@@ -1,4 +1,4 @@
-import { BlinkLEDPattern, LEDPattern } from "@/api";
+import { BlinkLEDPattern, LEDPattern } from "@/api/gen";
 import LEDPatternImpl from "./LEDPatternImpl";
 import {
   BlinkSpeedMin,

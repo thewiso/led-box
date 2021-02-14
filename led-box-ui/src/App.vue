@@ -2,15 +2,21 @@
 .app-bar-title {
   padding-left: 20px;
 }
+.language-btn.v-btn {
+  font-size: 30px;
+}
 </style>
 
 <template>
   <v-app>
     <v-app-bar app color="primary">
       <v-icon large color="accent" @click="handleAdminButtonClick()">mdi-led-on</v-icon>
-      <v-toolbar-title class="app-bar-title">LED Manager</v-toolbar-title>
+      <v-toolbar-title class="app-bar-title">LED Box</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-items>
+        <v-btn text class="language-btn" @click="chooseNextLanguage()">
+          {{ languageFlag }}
+        </v-btn>
         <v-btn icon @click="fetchData()">
           <v-icon large>mdi-refresh</v-icon>
         </v-btn>
@@ -29,7 +35,8 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import yaml from "js-yaml";
 import { ReadConstraintsFromOpenApiYaml } from "@/utils/LEDPatternConstraints";
-import LedBoxApi from "@/utils/LedBoxApi";
+import LedBoxApi from "@/api/LedBoxApi";
+import { Languages } from "@/plugins/i18n";
 
 //TODO: use class components
 @Component
@@ -62,6 +69,29 @@ export default class App extends Vue {
   fetchData() {
     LedBoxApi.getPatterns().catch(); //TODO: snackbar error
     LedBoxApi.getActivePattern().catch(); //TODO: snackbar error
+  }
+
+  get languageFlag(): string {
+    switch (this.$i18n.locale) {
+      case "en-US":
+        return "🇺🇸";
+      case "de-DE":
+        return "🇩🇪";
+      default:
+        console.warn(`Unknow locale '${this.$i18n.locale}' was set`);
+        return "❓";
+    }
+  }
+
+  chooseNextLanguage() {
+    let index = Languages.indexOf(this.$i18n.locale);
+    if (index === -1) {
+      index = 0;
+    } else {
+      index = (index + 1) % Languages.length;
+    }
+
+    this.$i18n.locale = Languages[index];
   }
 }
 </script>

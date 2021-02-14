@@ -5,13 +5,13 @@ import {
   Configuration,
   CreatePatternRequest,
   UpdatePatternRequest,
-} from "@/api";
-import * as runtime from "@/api/runtime.ts";
-import store from "@/store";
+} from "@/api/gen";
+import * as runtime from "@/api/gen/runtime.ts";
+import store from "@/plugins/store";
 import BlinkLEDPatternImpl from "@/utils/BlinkLEDPatternImpl";
 import ChaseLEDPatternImpl from "@/utils/ChaseLEDPatternImpl";
 import LEDPatternImpl from "@/utils/LEDPatternImpl";
-import { LEDPatternToJSON, NumberApiResponse } from "@/utils/ApiUtils";
+import { LEDPatternToJSON, NumberApiResponse } from "@/api/ApiUtils";
 
 const BASE_PATH =
   process.env.VUE_APP_API_BASE_PATH_USE_WINDOW_LOCATION == "true"

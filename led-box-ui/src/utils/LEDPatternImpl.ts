@@ -1,5 +1,5 @@
 import RGBColor from "./RGBColor";
-import { LEDPattern } from "@/api";
+import { LEDPattern } from "@/api/gen";
 import {
   ColorCountMin,
   ColorCountMax,

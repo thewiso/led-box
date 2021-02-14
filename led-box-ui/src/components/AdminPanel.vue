@@ -71,7 +71,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import LedBoxApi from "@/utils/LedBoxApi";
+import LedBoxApi from "@/api/LedBoxApi";
 
 @Component
 export default class AdminPanel extends Vue {

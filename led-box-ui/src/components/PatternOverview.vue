@@ -50,7 +50,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import PatternConfiguration from "@/components/PatternConfiguration.vue";
-import LedBoxApi from "@/utils/LedBoxApi";
+import LedBoxApi from "@/api/LedBoxApi";
 
 @Component({ components: { PatternConfiguration } })
 export default class PatternOvierview extends Vue {

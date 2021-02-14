@@ -1,4 +1,4 @@
-import { LEDPattern, ChaseLEDPattern } from "@/api";
+import { LEDPattern, ChaseLEDPattern } from "@/api/gen";
 import LEDPatternImpl from "./LEDPatternImpl";
 import RGBColor from "./RGBColor";
 import {

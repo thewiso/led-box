@@ -31,7 +31,7 @@
       <v-btn icon @click="close()">
         <v-icon large>mdi-close</v-icon>
       </v-btn>
-      <v-toolbar-title>Edit Pattern</v-toolbar-title>
+      <v-toolbar-title>{{ this.title }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-items>
         <v-btn icon @click="savePattern()" :disabled="!isPatternValid">
@@ -64,11 +64,13 @@
         <v-col cols="12">
           <v-expansion-panels multiple v-model="activePanels">
             <v-expansion-panel>
-              <v-expansion-panel-header color="secondary">General</v-expansion-panel-header>
+              <v-expansion-panel-header color="secondary">
+                {{ this.$t("patternConfiguration.attributes.categories.general") }}
+              </v-expansion-panel-header>
               <v-expansion-panel-content color="secondary">
                 <v-text-field
                   v-model="ledPattern.name"
-                  label="Name"
+                  :label="this.$t('patternConfiguration.attributes.name')"
                   required
                   clearable
                   :rules="rules.name"
@@ -77,7 +79,9 @@
             </v-expansion-panel>
 
             <v-expansion-panel>
-              <v-expansion-panel-header color="secondary">Colors</v-expansion-panel-header>
+              <v-expansion-panel-header color="secondary">
+                {{ this.$t("patternConfiguration.attributes.categories.colors") }}
+              </v-expansion-panel-header>
               <v-expansion-panel-content color="secondary">
                 <v-container class="color-container">
                   <v-row align="start" justify="center">
@@ -120,27 +124,33 @@
             </v-expansion-panel>
 
             <v-expansion-panel>
-              <v-expansion-panel-header color="secondary">Color Settings</v-expansion-panel-header>
+              <v-expansion-panel-header color="secondary">
+                {{ this.$t("patternConfiguration.attributes.categories.colorSettings") }}
+              </v-expansion-panel-header>
               <v-expansion-panel-content color="secondary">
                 <v-row>
                   <v-col cols="12">
-                    <v-subheader>Repition rate</v-subheader>
                     <v-slider
                       v-model="ledPattern.repitionFactor"
                       :min="minRepititonFactor"
                       :max="maxRepitionFactor"
                       :step="0"
                       :disabled="ledPattern.colors.length <= 1"
+                      :hint="this.$t('patternConfiguration.attributes.repititionRateHint')"
+                      persistent-hint
+                      :label="this.$t('patternConfiguration.attributes.repititionRate')"
                     ></v-slider>
                   </v-col>
                   <v-col cols="12">
-                    <v-subheader>Color gradient</v-subheader>
                     <v-slider
                       v-model="ledPattern.colorGradientLengthFactor"
                       :min="minColorGradient"
                       :max="maxColorGradient"
                       :step="0"
                       :disabled="ledPattern.colors.length <= 1"
+                      :hint="this.$t('patternConfiguration.attributes.colorGradientHint')"
+                      persistent-hint
+                      :label="this.$t('patternConfiguration.attributes.colorGradient')"
                     ></v-slider>
                   </v-col>
                 </v-row>
@@ -148,68 +158,95 @@
             </v-expansion-panel>
 
             <v-expansion-panel>
-              <v-expansion-panel-header color="secondary">Animation Settings</v-expansion-panel-header>
+              <v-expansion-panel-header color="secondary">
+                {{ this.$t("patternConfiguration.attributes.categories.animationSettings") }}
+              </v-expansion-panel-header>
               <v-expansion-panel-content color="secondary">
                 <v-row>
                   <v-col cols="12">
                     <v-radio-group v-model="selectedAnimationType" column>
-                      <v-radio label="No Animation" :value="animationTypeEnum.None"></v-radio>
-                      <v-radio label="Blink" :value="animationTypeEnum.Blink"></v-radio>
-                      <v-radio label="Chase" :value="animationTypeEnum.Chase"></v-radio>
+                      <v-radio
+                        :label="this.$t('patternConfiguration.attributes.noAnimation')"
+                        :value="animationTypeEnum.None"
+                      ></v-radio>
+                      <v-radio
+                        :label="this.$t('patternConfiguration.attributes.blinkAnimation')"
+                        :value="animationTypeEnum.Blink"
+                      ></v-radio>
+                      <v-radio
+                        :label="this.$t('patternConfiguration.attributes.chaseAnimation')"
+                        :value="animationTypeEnum.Chase"
+                      ></v-radio>
                     </v-radio-group>
                   </v-col>
                   <!-- BLINKING: -->
                   <v-col cols="12" v-if="selectedAnimationType == animationTypeEnum.Blink">
-                    <v-subheader>Blink speed</v-subheader>
                     <v-slider
                       v-model="ledPattern.blinkSpeed"
                       :min="minBlinkSpeed"
                       :max="maxBlinkSpeed"
                       :step="0"
+                      :hint="this.$t('patternConfiguration.attributes.blinkSpeedHint')"
+                      persistent-hint
+                      :label="this.$t('patternConfiguration.attributes.blinkSpeed')"
                     ></v-slider>
                   </v-col>
                   <v-col cols="12" v-if="selectedAnimationType == animationTypeEnum.Blink">
-                    <v-subheader>Blink dimming</v-subheader>
                     <v-slider
                       v-model="ledPattern.blinkDimmingPeriodFactor"
                       :min="minBlinkDimmingPeriodFactor"
                       :max="maxBlinkDimmingPeriodFactor"
                       :step="0"
+                      :hint="this.$t('patternConfiguration.attributes.blinkDimmingHint')"
+                      persistent-hint
+                      :label="this.$t('patternConfiguration.attributes.blinkDimming')"
                     ></v-slider>
                   </v-col>
                   <!-- LIGHT CHASE: -->
                   <v-col cols="12" v-if="selectedAnimationType == animationTypeEnum.Chase">
-                    <v-subheader>Chase speed</v-subheader>
                     <v-slider
                       v-model="ledPattern.chaseSpeed"
                       :min="minChaseSpeed"
                       :max="maxChaseSpeed"
                       :step="0"
+                      :hint="this.$t('patternConfiguration.attributes.chaseSpeedHint')"
+                      persistent-hint
+                      :label="this.$t('patternConfiguration.attributes.chaseSpeed')"
                     ></v-slider>
                   </v-col>
                   <v-col cols="12" v-if="selectedAnimationType == animationTypeEnum.Chase">
-                    <v-subheader>Chase length</v-subheader>
                     <v-slider
                       v-model="ledPattern.chaseLengthFactor"
                       :min="minChaseLengthFactor"
                       :max="maxChaseLengthFactor"
                       :step="0"
+                      :hint="this.$t('patternConfiguration.attributes.chaseLengthHint')"
+                      persistent-hint
+                      :label="this.$t('patternConfiguration.attributes.chaseLength')"
                     ></v-slider>
                   </v-col>
                   <v-col cols="12" v-if="selectedAnimationType == animationTypeEnum.Chase">
-                    <v-subheader>Chase gradient</v-subheader>
                     <v-slider
                       v-model="ledPattern.chaseGradientLengthFactor"
                       :min="minChaseGradientLengthFactor"
                       :max="maxChaseGradientLengthFactor"
                       :step="0"
+                      :hint="this.$t('patternConfiguration.attributes.chaseGradientHint')"
+                      persistent-hint
+                      :label="this.$t('patternConfiguration.attributes.chaseGradient')"
                     ></v-slider>
                   </v-col>
                   <v-col cols="12" v-if="selectedAnimationType == animationTypeEnum.Chase">
                     <v-subheader>Chase color</v-subheader>
                     <v-radio-group v-model="isPatternChaseColor" :mandatory="false" row>
-                      <v-radio label="Use pattern as chase color" :value="true"></v-radio>
-                      <v-radio label="Use pattern as background" :value="false"></v-radio>
+                      <v-radio
+                        :label="this.$t('patternConfiguration.attributes.isPatternChaseColorTrue')"
+                        :value="true"
+                      ></v-radio>
+                      <v-radio
+                        :label="this.$t('patternConfiguration.attributes.isPatternChaseColorFalse')"
+                        :value="false"
+                      ></v-radio>
                     </v-radio-group>
                     <v-row>
                       <v-col cols="6">
@@ -240,7 +277,7 @@
           <v-btn icon @click="closePickColorDialog()">
             <v-icon large>mdi-close</v-icon>
           </v-btn>
-          <v-toolbar-title>Pick Color</v-toolbar-title>
+          <v-toolbar-title>{{ this.$t("patternConfiguration.pickColor") }}</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-toolbar-items>
             <v-btn icon @click="closePickColorDialog(true)">
@@ -283,7 +320,7 @@ import {
 } from "@/utils/LEDPatternConstraints";
 import ChaseLEDPatternImpl from "@/utils/ChaseLEDPatternImpl";
 import LEDPatternImpl from "@/utils/LEDPatternImpl";
-import LedBoxApi from "@/utils/LedBoxApi";
+import LedBoxApi from "@/api/LedBoxApi";
 import BlinkLEDPatternImpl from "@/utils/BlinkLEDPatternImpl";
 import { LOOP_HEIGHT } from "@/utils/ledCanvasPreview/LedCanvasPreview";
 
@@ -363,7 +400,7 @@ export default class PatternConfiguration extends Vue {
     name: [
       (name: string) => {
         if ((name || "").trim().length == 0) {
-          return "Must contain any character except whitespace";
+          return this.$t("patternConfiguration.attributes.nameValidationHint");
         }
         return true;
       },
@@ -413,11 +450,10 @@ export default class PatternConfiguration extends Vue {
   }
 
   get title() {
-    //TODO: use
-    if (this.patternId === undefined) {
-      return "Create new pattern";
+    if (this.patternId != undefined && this.patternId != null) {
+      return this.$t("patternConfiguration.editPattern");
     } else {
-      return "Edit pattern";
+      return this.$t("patternConfiguration.createPattern");
     }
   }
 
@@ -541,6 +577,7 @@ export default class PatternConfiguration extends Vue {
   @Watch("reloadPatternIdTimestamp", { immediate: true })
   onReloadPatternIdTimestamp() {
     this.activePanels = [0, 1, 2, 3];
+    this.patternPreviewExpanded = true;
     if (this.patternId === null) {
       this.ledPattern = LEDPatternImpl.createRandomPattern();
     } else {

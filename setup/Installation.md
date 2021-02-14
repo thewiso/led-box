@@ -26,3 +26,4 @@ TODO: Capture portal
 TODO: Create sample database data
 TODO: reset leds at startup
 TODO: solve TODOs 
+TODO: document config file

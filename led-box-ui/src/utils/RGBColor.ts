@@ -1,4 +1,4 @@
-import { Color } from "@/api";
+import { Color } from "@/api/gen";
 import { getRandomInt } from "./RandomUtils";
 
 export default class RGBColor implements Color {
