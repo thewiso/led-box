@@ -7,7 +7,17 @@ export const Languages = ["en-US", "de-DE"];
 
 const messages = {
   "en-US": {
-    adminPanel: {},
+    adminPanel: {
+      categories: {
+        server: "Server",
+        database: "Database",
+      },
+      back: "Back",
+      armButton: "Arm button (Danger!)",
+      shutdown: "Shutdown",
+      reset: "Reset",
+      delete: "Delete everything",
+    },
     patternConfiguration: {
       editPattern: "Edit Pattern",
       createPattern: "Create New Pattern",
@@ -45,7 +55,17 @@ const messages = {
     },
   },
   "de-DE": {
-    adminPanel: {},
+    adminPanel: {
+      categories: {
+        server: "Server",
+        database: "Datenbank",
+      },
+      back: "Zurück",
+      armButton: "Button freischalten (Achtung!)",
+      shutdown: "Herunterfahren",
+      reset: "Zurücksetzen",
+      delete: "Alles löschen",
+    },
     patternConfiguration: {
       editPattern: "Muster anpassen",
       createPattern: "Neues Muster erstellen",

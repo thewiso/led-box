@@ -11,23 +11,25 @@
         <v-col cols="12">
           <v-btn color="primary" @click="navigateBack()">
             <v-icon left>mdi-chevron-double-left</v-icon>
-            Back
+            {{ this.$t("adminPanel.back") }}
           </v-btn>
         </v-col>
       </v-row>
       <v-row>
         <v-col cols="12">
           <v-card outlined>
-            <v-card-title>Server</v-card-title>
+            <v-card-title>
+              {{ this.$t("adminPanel.categories.server") }}
+            </v-card-title>
             <v-card-text>
               <v-row align="center" no-gutters>
                 <v-col cols="12">
                   <v-btn depressed color="error" :disabled="!shutdownArmed" @click="shutdown()">
-                    Shutdown
+                    {{ this.$t("adminPanel.shutdown") }}
                   </v-btn>
                 </v-col>
                 <v-col cols="12">
-                  <v-checkbox v-model="shutdownArmed" label="Arm button (Danger!)"></v-checkbox>
+                  <v-checkbox v-model="shutdownArmed" :label="this.$t('adminPanel.armButton')"></v-checkbox>
                 </v-col>
               </v-row>
             </v-card-text>
@@ -38,26 +40,28 @@
       <v-row>
         <v-col cols="12">
           <v-card outlined>
-            <v-card-title>Database</v-card-title>
+            <v-card-title>
+              {{ this.$t("adminPanel.categories.database") }}
+            </v-card-title>
             <v-card-text>
               <v-row align="center" no-gutters class="buttonRow">
                 <v-col cols="12">
                   <v-btn depressed color="error" :disabled="!resetDatabaseArmed" @click="resetDatabase()">
-                    Reset
+                    {{ this.$t("adminPanel.reset") }}
                   </v-btn>
                 </v-col>
                 <v-col cols="12">
-                  <v-checkbox v-model="resetDatabaseArmed" label="Arm button (Danger!)"></v-checkbox>
+                  <v-checkbox v-model="resetDatabaseArmed" :label="this.$t('adminPanel.armButton')"></v-checkbox>
                 </v-col>
               </v-row>
               <v-row align="center" no-gutters>
                 <v-col cols="12">
                   <v-btn depressed color="error" :disabled="!clearDatabaseArmed" @click="clearDatabase()">
-                    Delete everything
+                    {{ this.$t("adminPanel.delete") }}
                   </v-btn>
                 </v-col>
                 <v-col cols="auto">
-                  <v-checkbox v-model="clearDatabaseArmed" label="Arm button (Danger!)"></v-checkbox>
+                  <v-checkbox v-model="clearDatabaseArmed" :label="this.$t('adminPanel.armButton')"></v-checkbox>
                 </v-col>
               </v-row>
             </v-card-text>
