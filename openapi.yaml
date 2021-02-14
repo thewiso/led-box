@@ -187,7 +187,7 @@ components:
               type: number
               format: float
               minimum: 1
-              maximum: 300
+              maximum: 150
             chaseLengthFactor:
               description: "Describes how many of the strip's LED will be used for the chase. 0 = 1 LED, 0.99 = 99% of LED"
               type: number

@@ -34,14 +34,10 @@
       <v-toolbar-title>{{ this.title }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-items>
-        <v-btn
-          icon
-          @click="this.ledPattern.id !== undefined ? saveAndPlayPattern() : savePattern()"
-          :disabled="!isPatternValid"
-        >
+        <v-btn icon @click="savePattern()" :disabled="!isPatternValid">
           <v-icon large>mdi-content-save-outline</v-icon>
         </v-btn>
-        <v-btn icon @click="saveAndPlayPattern()" :disabled="!isPatternValid">
+        <v-btn icon @click="savePattern(true)" :disabled="!isPatternValid">
           <v-icon large>mdi-play-circle-outline</v-icon>
         </v-btn>
       </v-toolbar-items>
@@ -514,6 +510,7 @@ export default class PatternConfiguration extends Vue {
     this.pickColorDialogColor = color;
     this.pickColorDialogOpen = true;
   }
+
   closePickColorDialog(save?: boolean) {
     if (save) {
       const color = this.pickColorDialogColor;
@@ -531,9 +528,11 @@ export default class PatternConfiguration extends Vue {
     }
     this.pickColorDialogOpen = false;
   }
+
   removeColor(colorIndex: number) {
     this.ledPattern.removeColor(colorIndex);
   }
+
   getContrastFontColor(color: RGBColor): RGBColor {
     const colorAverage = (color.r + color.g + color.b) / 3;
     if (colorAverage < 128) {
@@ -542,42 +541,56 @@ export default class PatternConfiguration extends Vue {
       return RGBColor.Black;
     }
   }
+
   createColorIdentifier(index: number) {
     return new ColorIdentifier(index);
   }
-  savePattern(): Promise<number> {
+
+  savePattern(play?: boolean) {
+    let promise: Promise<number>;
     if (this.ledPattern.id !== undefined) {
       const savedPatternId = this.ledPattern.id;
-      return LedBoxApi.updatePattern({ id: this.ledPattern.id, lEDPattern: this.ledPattern })
-        .then(() => {
-          this.$store.commit("setPattern", this.ledPattern);
-          this.close();
-          return savedPatternId;
-        })
+      promise = LedBoxApi.updatePattern({ id: this.ledPattern.id, lEDPattern: this.ledPattern }).then(() => {
+        this.$store.commit("setPattern", this.ledPattern);
+        return savedPatternId;
+      });
+
+      if (this.$store.state.activePatternId == savedPatternId) {
+        promise.then(id => {
+          LedBoxApi.runPattern({ body: id });
+        });
+      }
+
+      promise
         .catch
         //TODO:
         ();
     } else {
-      return LedBoxApi.createPattern({ lEDPattern: this.ledPattern })
-        .then(id => {
-          this.ledPattern.id = id;
-          this.$store.commit("addPatterns", this.ledPattern);
-          this.close();
-          return id;
-        })
+      promise = LedBoxApi.createPattern({ lEDPattern: this.ledPattern }).then(id => {
+        this.ledPattern.id = id;
+        this.$store.commit("addPatterns", this.ledPattern);
+        return id;
+      });
+
+      if (play) {
+        promise.then(id => {
+          LedBoxApi.runPattern({ body: id });
+        });
+      }
+
+      promise
         .catch
         //TODO:
         ();
     }
+
+    promise.then(() => this.close());
   }
-  saveAndPlayPattern() {
-    this.savePattern().then(id => {
-      LedBoxApi.runPattern({ body: id });
-    });
-  }
+
   close() {
     this.$emit("configurationFinished");
   }
+
   togglePatternPreviewExpansion() {
     this.patternPreviewExpanded = !this.patternPreviewExpanded;
   }

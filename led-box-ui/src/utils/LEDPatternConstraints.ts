@@ -15,7 +15,7 @@ export let BlinkDimmingPeriodFactorMin = 0;
 export let BlinkDimmingPeriodFactorMax = 1;
 
 export let ChaseSpeedMin = 1;
-export let ChaseSpeedMax = 300;
+export let ChaseSpeedMax = 150;
 
 export let ChaseLengthFactorMin = 0;
 export let ChaseLengthFactorMax = 0.99;
