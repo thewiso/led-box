@@ -34,7 +34,11 @@
       <v-toolbar-title>{{ this.title }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-items>
-        <v-btn icon @click="savePattern()" :disabled="!isPatternValid">
+        <v-btn
+          icon
+          @click="this.ledPattern.id !== undefined ? saveAndPlayPattern() : savePattern()"
+          :disabled="!isPatternValid"
+        >
           <v-icon large>mdi-content-save-outline</v-icon>
         </v-btn>
         <v-btn icon @click="saveAndPlayPattern()" :disabled="!isPatternValid">
@@ -237,7 +241,9 @@
                     ></v-slider>
                   </v-col>
                   <v-col cols="12" v-if="selectedAnimationType == animationTypeEnum.Chase">
-                    <v-subheader>Chase color</v-subheader>
+                    <v-label>
+                      {{ this.$t("patternConfiguration.attributes.chaseColor") }}
+                    </v-label>
                     <v-radio-group v-model="isPatternChaseColor" :mandatory="false" row>
                       <v-radio
                         :label="this.$t('patternConfiguration.attributes.isPatternChaseColorTrue')"
@@ -420,6 +426,8 @@ export default class PatternConfiguration extends Vue {
       } else if (!newValue && this.ledPattern.chaseForeground === undefined) {
         this.ledPattern.chaseForeground = RGBColor.White;
       }
+      //this is a workaround because the computed property isPatternChaseColor will not update otherwise
+      this.ledPattern = new ChaseLEDPatternImpl(this.ledPattern);
     }
   }
 
