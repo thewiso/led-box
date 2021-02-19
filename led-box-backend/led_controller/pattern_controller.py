@@ -26,7 +26,7 @@ __leds.deinit()
 __leds = adafruit_ws2801.WS2801(
 	board.SCK, board.MOSI, PatternAnimator.LED_COUNT, auto_write=False)
 __leds.brightness = 1
-
+__leds.fill((0, 0, 0))
 
 def start_pattern_display(led_pattern: LEDPattern):
 	with __pattern_lock:

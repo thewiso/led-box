@@ -20,6 +20,20 @@ def create_pattern(body: dict):
     return id, 201
 
 
+def get_patterns():
+    __LOG.info("Received 'get_patterns' request")
+    return led_box_db.get_patterns()
+
+
+def delete_all_patterns(restore_examples=None):
+    __LOG.info("Received 'delete_all_patterns' request")
+    __LOG.debug(restore_examples)
+
+    led_box_db.drop_and_create_tables()
+    if(restore_examples == True):
+        led_box_db.insert_example_pattern()
+
+
 def update_pattern(id_: int, body: dict):
     __LOG.info(f"Received 'update_pattern' request for id {id}")
     __LOG.debug(body)
@@ -31,11 +45,6 @@ def update_pattern(id_: int, body: dict):
         return None, 404
 
 
-def get_patterns():
-    __LOG.info("Received 'get_patterns' request")
-    return led_box_db.get_patterns()
-
-
 def get_active_pattern():
     __LOG.info("Received 'get_active_pattern' request")
     active_pattern_id = pattern_controller.get_active_pattern_id()
@@ -43,7 +52,7 @@ def get_active_pattern():
     if active_pattern_id is not None:
         return active_pattern_id, 200
     else:
-        return None, 404
+        return None, 204
 
 
 def run_pattern(body=None):
@@ -73,15 +82,6 @@ def stop_pattern():
     pattern_controller.stop_pattern_display()
 
     return None, 204
-
-
-def delete_all_patterns(restore_examples=None):
-    __LOG.info("Received 'delete_all_patterns' request")
-    __LOG.debug(restore_examples)
-
-    led_box_db.drop_and_create_tables()
-    if(restore_examples == True):
-        led_box_db.insert_example_pattern()
 
 
 def shutdown_server():

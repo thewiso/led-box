@@ -76,6 +76,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import LedBoxApi from "@/api/LedBoxApi";
+import * as ErrorEventBus from "@/utils/ErrorEventBus";
 
 @Component
 export default class AdminPanel extends Vue {
@@ -92,24 +93,34 @@ export default class AdminPanel extends Vue {
     this.$router.push("/");
   }
   shutdown() {
-    LedBoxApi.shutdownServer().catch(); //TODO:;
+    LedBoxApi.shutdownServer().catch(reason => {
+      ErrorEventBus.emitError(reason, this.$t("errors.generalError").toString());
+    });
     this.shutdownArmed = false;
   }
   resetDatabase() {
     LedBoxApi.deleteAllPatterns({ restoreExamples: true })
       .then(() => this.fetchData())
-      .catch(); //TODO:
+      .catch(reason => {
+        ErrorEventBus.emitError(reason, this.$t("errors.generalError").toString());
+      });
     this.resetDatabaseArmed = false;
   }
   clearDatabase() {
     LedBoxApi.deleteAllPatterns({ restoreExamples: false })
       .then(() => this.fetchData())
-      .catch(); //TODO:
+      .catch(reason => {
+        ErrorEventBus.emitError(reason, this.$t("errors.generalError").toString());
+      });
     this.clearDatabaseArmed = false;
   }
   fetchData() {
-    LedBoxApi.getPatterns().catch(); //TODO: snackbar error
-    LedBoxApi.getActivePattern().catch(); //TODO: snackbar error
+    LedBoxApi.getPatterns().catch(reason => {
+      ErrorEventBus.emitError(reason, this.$t("errors.loadPatterns").toString());
+    });
+    LedBoxApi.getActivePattern().catch(reason => {
+      ErrorEventBus.emitError(reason, this.$t("errors.loadActivePattern").toString());
+    });
   }
 }
 </script>

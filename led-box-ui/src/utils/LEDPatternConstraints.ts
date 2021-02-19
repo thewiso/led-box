@@ -1,4 +1,6 @@
-//TODO: name max length!
+export let NameMinLength = 3;
+export let NameMaxLength = 20;
+
 export let ColorCountMin = 1;
 export let ColorCountMax = 5;
 
@@ -29,6 +31,9 @@ const MAX_ITEMS_PROPERTY = "maxItems";
 const MINIMUM_PROPERTY = "minimum";
 const MAXIMUM_PROPERTY = "maximum";
 
+const MIN_LENGTH_PROPERTY = "minLength";
+const MAX_LENGTH_PROPERTY = "maxLength";
+
 function GetConstraintFromLedPatternProperties<T>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   schemas: any,
@@ -50,6 +55,21 @@ export function ReadConstraintsFromOpenApiYaml(yamlDoc: any | null | undefined) 
   const schemas = yamlDoc?.["components"]?.["schemas"];
 
   if (schemas !== undefined) {
+    NameMinLength = GetConstraintFromLedPatternProperties(
+      schemas,
+      "LEDPattern",
+      "name",
+      MIN_LENGTH_PROPERTY,
+      NameMinLength,
+    );
+    NameMaxLength = GetConstraintFromLedPatternProperties(
+      schemas,
+      "LEDPattern",
+      "name",
+      MAX_LENGTH_PROPERTY,
+      NameMinLength,
+    );
+
     ColorCountMin = GetConstraintFromLedPatternProperties(
       schemas,
       "LEDPattern",
@@ -170,6 +190,6 @@ export function ReadConstraintsFromOpenApiYaml(yamlDoc: any | null | undefined) 
       ChaseGradientLengthFactorMax,
     );
   } else {
-    //TODO: log
+    throw new Error("Could not parse yaml because document.components.schemas is undefined: " + yamlDoc);
   }
 }

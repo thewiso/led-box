@@ -154,7 +154,6 @@ export default class LEDPatternImpl implements LEDPattern {
     randomPattern.repitionFactor = getRandom(RepititionFactorMin, RepititionFactorMax);
     randomPattern.colorGradientLengthFactor = getRandom(ColorGradientLengthFactorMin, ChaseGradientLengthFactorMax);
 
-    //TODO: nice example names
     randomPattern.name = createRandomName();
 
     return randomPattern;

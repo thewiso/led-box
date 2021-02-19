@@ -319,12 +319,15 @@ import {
   ChaseLengthFactorMax,
   ChaseGradientLengthFactorMin,
   ChaseGradientLengthFactorMax,
+  NameMinLength,
+  NameMaxLength,
 } from "@/utils/LEDPatternConstraints";
 import ChaseLEDPatternImpl from "@/utils/ChaseLEDPatternImpl";
 import LEDPatternImpl from "@/utils/LEDPatternImpl";
 import LedBoxApi from "@/api/LedBoxApi";
 import BlinkLEDPatternImpl from "@/utils/BlinkLEDPatternImpl";
 import { LOOP_HEIGHT } from "@/utils/ledCanvasPreview/LedCanvasPreview";
+import * as ErrorEventBus from "@/utils/ErrorEventBus";
 
 enum AnimiationType {
   None,
@@ -402,7 +405,19 @@ export default class PatternConfiguration extends Vue {
     name: [
       (name: string) => {
         if ((name || "").trim().length == 0) {
-          return this.$t("patternConfiguration.attributes.nameValidationHint");
+          return this.$t("patternConfiguration.attributes.emptyValidationHint");
+        }
+        return true;
+      },
+      (name: string) => {
+        if (name.length < NameMinLength) {
+          return this.$t("patternConfiguration.attributes.tooShortValidationHint");
+        }
+        return true;
+      },
+      (name: string) => {
+        if (name.length > NameMaxLength) {
+          return this.$t("patternConfiguration.attributes.tooLongValidationHint");
         }
         return true;
       },
@@ -450,7 +465,11 @@ export default class PatternConfiguration extends Vue {
     }
   }
   get isPatternValid() {
-    return (this.ledPattern.name || "").trim().length > 0;
+    return (
+      (this.ledPattern.name || "").trim().length > 0 &&
+      this.ledPattern.name.length >= NameMinLength &&
+      this.ledPattern.name.length <= NameMaxLength
+    );
   }
 
   get title() {
@@ -561,10 +580,9 @@ export default class PatternConfiguration extends Vue {
         });
       }
 
-      promise
-        .catch
-        //TODO:
-        ();
+      promise.catch(reason => {
+        ErrorEventBus.emitError(reason, this.$t("errors.savePattern").toString());
+      });
     } else {
       promise = LedBoxApi.createPattern({ lEDPattern: this.ledPattern }).then(id => {
         this.ledPattern.id = id;
@@ -578,17 +596,16 @@ export default class PatternConfiguration extends Vue {
         });
       }
 
-      promise
-        .catch
-        //TODO:
-        ();
+      promise.catch(reason => {
+        ErrorEventBus.emitError(reason, this.$t("errors.savePattern").toString());
+      });
     }
 
     promise.then(() => this.close());
   }
 
   close() {
-    this.$emit("configurationFinished");
+    this.$emit("ConfigurationFinished");
   }
 
   togglePatternPreviewExpansion() {
@@ -604,7 +621,6 @@ export default class PatternConfiguration extends Vue {
     } else {
       this.ledPattern = this.$store.getters.getPatternById(this.patternId).clone();
       if (this.ledPattern === undefined) {
-        //TODO:
         console.error(`No pattern was found for given id ${this.patternId}`);
         this.closePickColorDialog();
       }

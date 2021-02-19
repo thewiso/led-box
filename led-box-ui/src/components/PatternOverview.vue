@@ -38,7 +38,7 @@
     </v-btn>
     <v-dialog v-model="patternConfigurationDialogOpen" fullscreen hide-overlay transition="dialog-bottom-transition">
       <PatternConfiguration
-        @configurationFinished="closeConfigurationDialog()"
+        @ConfigurationFinished="closeConfigurationDialog()"
         :patternId="selectedPatternId"
         :reloadPatternIdTimestamp="reloadConfigurationPatternIdTimestamp"
       />
@@ -51,6 +51,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import PatternConfiguration from "@/components/PatternConfiguration.vue";
 import LedBoxApi from "@/api/LedBoxApi";
+import * as ErrorEventBus from "@/utils/ErrorEventBus";
 
 @Component({ components: { PatternConfiguration } })
 export default class PatternOvierview extends Vue {
@@ -63,18 +64,22 @@ export default class PatternOvierview extends Vue {
   }
 
   fetchData() {
-    LedBoxApi.getPatterns().catch(); //TODO: snackbar error
-    LedBoxApi.getActivePattern().catch(); //TODO: snackbar error
+    LedBoxApi.getPatterns().catch(reason => {
+      ErrorEventBus.emitError(reason, this.$t("errors.loadPatterns").toString());
+    });
+    LedBoxApi.getActivePattern().catch(reason => {
+      ErrorEventBus.emitError(reason, this.$t("errors.loadActivePattern").toString());
+    });
   }
   startPattern(patternId: number) {
-    LedBoxApi.runPattern({ body: patternId })
-      .catch //TODO: snackbar error
-      ();
+    LedBoxApi.runPattern({ body: patternId }).catch(reason => {
+      ErrorEventBus.emitError(reason, this.$t("errors.runPattern").toString());
+    });
   }
   stopPattern() {
-    LedBoxApi.stopPattern()
-      .catch //TODO: snackbar error
-      ();
+    LedBoxApi.stopPattern().catch(reason => {
+      ErrorEventBus.emitError(reason, this.$t("errors.stopPattern").toString());
+    });
   }
   createPattern() {
     this.startConfigurationDialog(null);

@@ -30,7 +30,9 @@ const messages = {
           animationSettings: "Animation Settings",
         },
         name: "Name",
-        nameValidationHint: "Must contain any character except whitespace",
+        emptyValidationHint: "Must contain any character except whitespace",
+        tooShortValidationHint: "Is too short",
+        tooLongValidationHint: "Is too long",
         repititionRate: "Repitition rate",
         repititionRateHint: "How often the colors get repeated",
         colorGradient: "Color gradient",
@@ -52,6 +54,14 @@ const messages = {
         isPatternChaseColorTrue: "Use pattern as chase color",
         isPatternChaseColorFalse: "Choose chase color and use pattern as background",
       },
+    },
+    errors: {
+      loadPatterns: "Could not load patterns, please reload and try again later",
+      loadActivePattern: "Could not load active pattern, please reload and try again later",
+      runPattern: "Could not start pattern, please reload and try again later",
+      stopPattern: "Could not stop pattern, please reload and try again later",
+      savePattern: "Could not save pattern, please reload and try again later",
+      generalError: "Could not fulfil operation, please reload and try again later",
     },
   },
   "de-DE": {
@@ -78,7 +88,9 @@ const messages = {
           animationSettings: "Animationseinstellungen",
         },
         name: "Name",
-        nameValidationHint: "Muss aus mindestens einem Zeichen außer Leerzeichen bestehen",
+        emptyValidationHint: "Muss aus mindestens einem Zeichen außer Leerzeichen bestehen",
+        tooShortValidationHint: "Ist zu kurz",
+        tooLongValidationHint: "Ist zu lang",
         repititionRate: "Wiederholungsfaktor",
         repititionRateHint: "Wie oft werden die Farben wiederholt",
         colorGradient: "Farbgradient",
@@ -100,6 +112,20 @@ const messages = {
         isPatternChaseColorTrue: "Das Muster als Farbe des Lichtlaufs verwenden",
         isPatternChaseColorFalse: "Eine eigene Farbe als Lichtlauf mit dem Muster als Hintergrund verwenden",
       },
+    },
+    errors: {
+      loadPatterns:
+        "Muster konnten nicht geladen werden, bitte laden Sie die Seite neu und versuchen Sie es später noch einmal",
+      loadActivePattern:
+        "Aktives Muster konnte nicht geladen werden, bitte laden Sie die Seite neu und versuchen Sie es später noch einmal",
+      runPattern:
+        "Muster konnte nicht abgespielt werden, bitte laden Sie die Seite neu und versuchen Sie es später noch einmal",
+      stopPattern:
+        "Muster konnte nicht gestoppt werden, bitte laden Sie die Seite neu und versuchen Sie es später noch einmal",
+      savePattern:
+        "Muster konnte nicht gespeichert werden, bitte laden Sie die Seite neu und versuchen Sie es später noch einmal",
+      generalError:
+        "Operation konnte nicht abgeschlossen werden, bitte laden Sie die Seite neu und versuchen Sie es später noch einmal",
     },
   },
 };
