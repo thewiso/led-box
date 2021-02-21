@@ -26,10 +26,10 @@
 # Set up own wireless LAN
 This setup is useful if you are going to use Led-Box both at your home and "on tour". The Raspberry Pi will try to connect to your home Wifi at startup and if not succesfull, create it's own WLAN network.
 
-1. Copy the content of setup/rc.local into /etc/rc.local. **Important: Move the existing "exit 0" command to the end of the file.** Replace "CHANGE_TO_YOUR_HOME_SSID" with the SSID of your home network.
-2. <code>sudo sh setup/configureStandaloneWLAN.sh</code>
-3. <code>sudo reboot</code>
-4. If the Raspberry Pi creates it's own WLAN, the UI is rachable under http://led.box or http://192.168.0.1
+1. In setup/startWLAN.sh, replace "CHANGE_TO_YOUR_HOME_SSID" with the SSID of your home network.
+2. Add line <code>sudo sh /home/pi/led-box/setup/startWLAN.sh check & </code> to /etc/rc.local **before the final "exit 0" command.** 
+4. <code>sudo reboot</code>
+5. If the Raspberry Pi creates it's own WLAN, the UI is rachable under http://led.box or http://192.168.0.1
 
 
 TODO: Captive portal

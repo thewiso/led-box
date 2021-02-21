@@ -1,3 +1,5 @@
+#!/bin/sh
+
 echo "Installing general dependencies..."
 sudo apt-get update -y && sudo apt-get upgrade -y
 sudo apt-get install -y git python3 python3-pip nginx

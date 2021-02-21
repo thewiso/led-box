@@ -1,3 +1,5 @@
+#!/bin/sh
+
 echo "Configure wsgi service..."
 sudo cp led-box-backend/led_box_backend.service /etc/systemd/system/
 sudo systemctl start led_box_backend

@@ -1,8 +1,0 @@
-sleep 15
-GREP_COUNT=$(iwconfig wlan0 | grep -c "CHANGE_TO_YOUR_HOME_SSID")
-
-if [ "$GREP_COUNT" = "0" ]
-then
-        echo "Not connected to home network, starting own WLAN"
-        sudo sh /home/pi/led-box/setup/startWLAN.sh
-fi
