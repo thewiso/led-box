@@ -4,6 +4,7 @@ HOME_NETWORK_SSID="CHANGE_TO_YOUR_HOME_SSID"
 
 if [ "$1" = "check" ]
 then
+	echo "Check if connected to home network..."
 	sleep 15
 	GREP_COUNT=$(iwconfig wlan0 | grep -c "CHANGE_TO_YOUR_HOME_SSID")
 	if [ "$GREP_COUNT" = "0" ]
