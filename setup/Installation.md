@@ -28,11 +28,10 @@ This setup is useful if you are going to use Led-Box both at your home and "on t
 
 1. In setup/startWLAN.sh, replace "CHANGE_TO_YOUR_HOME_SSID" with the SSID of your home network.
 2. Add line <code>sudo sh /home/pi/led-box/setup/startWLAN.sh check & </code> to /etc/rc.local **before the final "exit 0" command.** 
+3. Edit /etc/nginx/nginx.conf: Set <code>server_names_hash_bucket_size</code> in "http"-block to 64
 4. <code>sudo reboot</code>
 5. If the Raspberry Pi creates it's own WLAN, the UI is rachable under http://led.box or http://192.168.0.1
 
-
-TODO: Captive portal
 TODO: Create sample database data
 TODO: solve TODOs 
 TODO: document config file
