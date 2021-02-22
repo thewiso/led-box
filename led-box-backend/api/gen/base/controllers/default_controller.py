@@ -1,8 +1,8 @@
 import connexion
 import six
 
-from base.models.led_pattern import LEDPattern  # noqa: E501
-from base import util
+from ...base.models.led_pattern import LEDPattern  # noqa: E501
+from ...base import util
 
 
 def create_pattern(led_pattern):  # noqa: E501

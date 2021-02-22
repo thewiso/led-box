@@ -6,8 +6,8 @@ import unittest
 from flask import json
 from six import BytesIO
 
-from base.models.led_pattern import LEDPattern  # noqa: E501
-from base.test import BaseTestCase
+from ...base.models.led_pattern import LEDPattern  # noqa: E501
+from ...base.test import BaseTestCase
 
 
 class TestDefaultController(BaseTestCase):
