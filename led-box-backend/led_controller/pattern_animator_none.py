@@ -1,7 +1,7 @@
 from led_controller.pattern_animator import PatternAnimator
 import adafruit_ws2801
 import logging
-from api.model.led_pattern import LEDPattern
+from api.gen.base.models.led_pattern import LEDPattern
 
 
 class PatternAnimatorNone(PatternAnimator):

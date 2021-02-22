@@ -2,7 +2,8 @@
 
 import connexion
 from connexion.resolver import RestyResolver
-from api.util import encoder, validator
+from api.gen.base import encoder
+from api.util import validator
 from api.util.camel_case_resolver import CamelCaseResolver
 import logging
 import sys

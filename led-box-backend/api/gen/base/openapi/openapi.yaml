@@ -1,0 +1,280 @@
+openapi: 3.0.1
+info:
+  title: LED Box API
+  version: 1.0.0
+servers:
+- url: /
+paths:
+  /led-patterns:
+    delete:
+      description: Delete all patterns
+      operationId: delete_all_patterns
+      parameters:
+      - description: Flag indicating if the examples should be restored
+        explode: true
+        in: query
+        name: restoreExamples
+        required: false
+        schema:
+          type: boolean
+        style: form
+      responses:
+        "204":
+          description: No Content
+      x-openapi-router-controller: base.controllers.default_controller
+    get:
+      description: Get all patterns
+      operationId: get_patterns
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/LEDPattern'
+                type: array
+          description: Ok
+        "400":
+          description: Bad Request
+      x-openapi-router-controller: base.controllers.default_controller
+    post:
+      operationId: create_pattern
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LEDPattern'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                description: Id of the created pattern
+                type: integer
+          description: Created
+        "400":
+          description: Bad Request
+      x-openapi-router-controller: base.controllers.default_controller
+  /led-patterns/active:
+    delete:
+      description: Stop currently active pattern
+      operationId: stop_pattern
+      responses:
+        "204":
+          description: No Content
+      x-openapi-router-controller: base.controllers.default_controller
+    get:
+      description: Get currently active pattern id
+      operationId: get_active_pattern
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                description: Id of currently active pattern
+                type: integer
+          description: Ok
+        "204":
+          description: Not Content
+      x-openapi-router-controller: base.controllers.default_controller
+    put:
+      description: Put new active pattern
+      operationId: run_pattern
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: Id of the new active pattern
+              type: integer
+        required: true
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      x-openapi-router-controller: base.controllers.default_controller
+  /led-patterns/{id}:
+    patch:
+      operationId: update_pattern
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LEDPattern'
+        required: true
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      x-openapi-router-controller: base.controllers.default_controller
+  /server/shutdown:
+    post:
+      description: Shutdown server and hosting system
+      operationId: shutdown_server
+      responses:
+        "202":
+          description: Accepted
+      x-openapi-router-controller: base.controllers.default_controller
+components:
+  schemas:
+    LEDPattern:
+      discriminator:
+        propertyName: patternType
+      example:
+        repitionFactor: 0.5637377
+        colorGradientLengthFactor: 0.11510679
+        name: name
+        patternType: patternType
+        id: 0
+        colors:
+        - r: 153
+          b: 152
+          g: 37
+        - r: 153
+          b: 152
+          g: 37
+        - r: 153
+          b: 152
+          g: 37
+        - r: 153
+          b: 152
+          g: 37
+        - r: 153
+          b: 152
+          g: 37
+      properties:
+        id:
+          type: integer
+        name:
+          maxLength: 20
+          minLength: 3
+          type: string
+        colors:
+          description: Colors that will be displayed in-line
+          items:
+            $ref: '#/components/schemas/Color'
+          maxItems: 5
+          minItems: 1
+          type: array
+        repitionFactor:
+          description: Describes how often the colors will be repeated in the LED
+            strip. 0 = No repetition, 1 = One LED per color
+          format: float
+          maximum: 1
+          minimum: 0
+          type: number
+        colorGradientLengthFactor:
+          description: Describes how many of the LED of one color create a gradient
+            to the next and previous color. 0 = No gradient, 0.5 Half of LED create
+            a gradient to the next and previous color
+          format: float
+          maximum: 0.5
+          minimum: 0
+          type: number
+        patternType:
+          type: string
+      required:
+      - colorGradientLengthFactor
+      - colors
+      - name
+      - patternType
+      - repitionFactor
+      type: object
+    BlinkLEDPattern:
+      allOf:
+      - $ref: '#/components/schemas/LEDPattern'
+      - $ref: '#/components/schemas/BlinkLEDPattern_allOf'
+    ChaseLEDPattern:
+      allOf:
+      - $ref: '#/components/schemas/LEDPattern'
+      - $ref: '#/components/schemas/ChaseLEDPattern_allOf'
+    Color:
+      description: RGB Color
+      example:
+        r: 153
+        b: 152
+        g: 37
+      properties:
+        r:
+          description: Red
+          maximum: 255
+          minimum: 0
+          type: integer
+        g:
+          description: Green
+          maximum: 255
+          minimum: 0
+          type: integer
+        b:
+          description: Blue
+          maximum: 255
+          minimum: 0
+          type: integer
+      required:
+      - b
+      - g
+      - r
+      type: object
+    BlinkLEDPattern_allOf:
+      properties:
+        blinkSpeed:
+          description: Describes how often the LED will blink in a second
+          format: float
+          maximum: 3
+          minimum: 0.1
+          type: number
+        blinkDimmingPeriodFactor:
+          description: Describes how much of the blinking time is used for blinking.
+            0 = No dimming, 1 = Full period between on and off will be dimmed
+          format: float
+          maximum: 1
+          minimum: 0
+          type: number
+      required:
+      - blinkDimmingPeriodFactor
+      - blinkSpeed
+      type: object
+    ChaseLEDPattern_allOf:
+      properties:
+        chaseSpeed:
+          description: Describes how many LED per second the chase will move
+          format: float
+          maximum: 150
+          minimum: 1
+          type: number
+        chaseLengthFactor:
+          description: Describes how many of the strip's LED will be used for the
+            chase. 0 = 1 LED, 0.99 = 99% of LED
+          format: float
+          maximum: 0.99
+          minimum: 0
+          type: number
+        chaseGradientLengthFactor:
+          description: Describes how many of the LED of one the chase create a gradient
+            to the next and previous color. 0 = No gradient, 0.5 Half of the chase's
+            LED create a gradient to the next and previous color
+          format: float
+          maximum: 0.5
+          minimum: 0
+          type: number
+        chaseForeground:
+          $ref: '#/components/schemas/Color'
+      required:
+      - chaseGradientLengthFactor
+      - chaseLengthFactor
+      - chaseSpeed
+      type: object

@@ -1,10 +1,11 @@
 import connexion
-from .model.led_pattern import LEDPattern
-from .model.blink_led_pattern import BlinkLEDPattern
-from .model.chase_led_pattern import ChaseLEDPattern
+from connexion.lifecycle import ConnexionResponse
+from .gen.base.models.led_pattern import LEDPattern
+from .gen.base.models.blink_led_pattern import BlinkLEDPattern
+from .gen.base.models.chase_led_pattern import ChaseLEDPattern
 from db import led_box_db
 import json
-from typing import Tuple, Any, List
+from typing import Tuple, Any, List, Type
 import logging
 import led_controller.pattern_controller as pattern_controller
 import subprocess
@@ -22,16 +23,18 @@ def create_pattern(body: dict):
 
 def get_patterns():
     __LOG.info("Received 'get_patterns' request")
-    return led_box_db.get_patterns()
+    return led_box_db.get_patterns(), 200
 
 
-def delete_all_patterns(restore_examples=None):
+def delete_all_patterns(restore_examples: bool = None):
     __LOG.info("Received 'delete_all_patterns' request")
     __LOG.debug(restore_examples)
 
     led_box_db.drop_and_create_tables()
     if(restore_examples == True):
         led_box_db.insert_example_pattern()
+
+    return None, 204
 
 
 def update_pattern(id_: int, body: dict):
@@ -40,7 +43,7 @@ def update_pattern(id_: int, body: dict):
 
     if led_box_db.is_pattern_existing(id_):
         led_box_db.update_pattern(id_, body)
-        return None, 200
+        return None, 204
     else:
         return None, 404
 
@@ -55,7 +58,7 @@ def get_active_pattern():
         return None, 204
 
 
-def run_pattern(body=None):
+def run_pattern(body: int = None):
     __LOG.info("Received 'run_pattern' request")
     __LOG.debug(body)
 
@@ -94,3 +97,5 @@ def shutdown_server():
 
     if completed_process.returncode != 0:
         __LOG.info(f"Could not shutdown system: {completed_process.stderr}")
+
+        return None, 202

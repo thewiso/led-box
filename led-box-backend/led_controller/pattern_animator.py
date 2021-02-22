@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import adafruit_ws2801
-from api.model.led_pattern import LEDPattern, Color
+from api.gen.base.models.led_pattern import LEDPattern, Color
 import math
 from typing import Tuple, List
 

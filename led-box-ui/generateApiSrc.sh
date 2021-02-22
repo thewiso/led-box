@@ -1,3 +1,5 @@
+#!/bin/sh
+
 npx @openapitools/openapi-generator-cli generate \
 -i ../openapi.yaml \
 -o src/api/gen \
