@@ -14,12 +14,13 @@ LED Box is a project created and written for a Raspberry Pi connected to a WS280
 The LED Box is based on a Raspberry Pi W (W stands for Wireless) and a 5m long LED strip with a WS2801 controller. You should use a 5V power supply with at least 10a. 
 
 I designed and printed a case with my 3D printer (LEDBoxCase.stl). 
-![](img/case_closed.jpg | width=100)
+
+<img src="img/case_closed.jpg" width="300">
 
 Therefore my wiring is very specialized and compact to fit in the case: A circuit board with the connectors for power and the LED controller and the level shifter is plugged onto the pins of the Raspberry PI. The exact wiring is described by the led-box.fzz file for [Fritzing](https://fritzing.org/).
-![](img/case_open.jpg | width=100)
-![](img/wiring_side.jpg | width=100)
-![](img/wiring_up.jpg | width=100)
+
+<img src="img/case_open.jpg" width="300"> <img src="img/wiring_side.jpg" width="300"> <img src="img/wiring_up.jpg" width="300">
+
 
 
 <br/>
@@ -34,8 +35,8 @@ To install the software on a Rasberry Pi, follow the [installation instruction](
 
 The frontend is written in Vue.js and uses the [Vuetify](https://vuetifyjs.com) component library. It fetches the patterns from the backend and lets the user edit, save and play these patterns. To simplfiy the editing of patterns, the UI provides a preview for any pattern directly on the website. (It took me way to long to implement this...) The language can be switched between American English and German.
 
-![](img/ui_screenshot.jpg | width=100)
-![](img/ui_preview.gif | width=100)
+<img src="img/ui_screenshot.jpg" width="300"> <img src="img/ui_preview.gif" width="300">
+
 
 Also there is a hidden "admin area" to shutdown the server or reset/delete the saved pattterns. It can be accessed by clicking 5 times on the LED icon in the upper left corner.
 
