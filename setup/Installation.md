@@ -31,9 +31,3 @@ This setup is useful if you are going to use Led-Box both at your home and "on t
 3. Edit /etc/nginx/nginx.conf: Set <code>server_names_hash_bucket_size</code> in "http"-block to 64
 4. <code>sudo reboot</code>
 5. If the Raspberry Pi creates it's own WLAN, the UI is rachable under http://led.box or http://192.168.0.1
-
-TODO: Create sample database data
-TODO: solve TODOs 
-TODO: document config file
-TODO: html title of ui
-TODO: document circuit diagram, housing
