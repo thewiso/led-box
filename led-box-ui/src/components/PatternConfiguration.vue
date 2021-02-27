@@ -574,7 +574,7 @@ export default class PatternConfiguration extends Vue {
         return savedPatternId;
       });
 
-      if (this.$store.state.activePatternId == savedPatternId) {
+      if (this.$store.state.activePatternId == savedPatternId || play) {
         promise.then(id => {
           LedBoxApi.runPattern({ body: id });
         });
@@ -600,8 +600,6 @@ export default class PatternConfiguration extends Vue {
         ErrorEventBus.emitError(reason, this.$t("errors.savePattern").toString());
       });
     }
-
-    promise.then(() => this.close());
   }
 
   close() {
